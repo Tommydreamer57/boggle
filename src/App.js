@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import Boggle from './components/Boggle';
+import axios from 'axios';
 
 const defaultDimension = 5
 
@@ -71,14 +72,17 @@ class App extends Component {
     this.setState({ ...update });
     this.updatePath();
   }
-  // validateWords() {
-  //   const { boggle, words } = this.state;
-  //   const validations = [];
-  //   words.forEach(word => {
-  //     validations.push(boggle.validate(word.value));
-  //   });
-  //   console.log(validations);
-  // }
+  validateWords() {
+    const { boggle, words } = this.state;
+    const validations = [];
+    
+    words.forEach(word => {
+      if (boggle.validate(word.value).length) {
+        validations.push(word);        
+      }
+    });
+    console.log(validations);
+  }
   updatePath(word) {
     console.log(word);
     const { boggle } = this.state;
@@ -159,13 +163,15 @@ class App extends Component {
                             onClick={this.handleClick.bind(this, letter.coordinates)}
                           >
                             <div className={`letter ${used ? 'used' : ''} ${available ? 'available' : ''} ${last ? 'last' : ''}`} >
-                              {
-                                index ?
-                                  <div className="index" >{index}</div>
-                                  :
-                                  null
-                              }
-                              {letter.value}
+                              <div className="circle" >
+                                {
+                                  index ?
+                                    <div className="index" >{index}</div>
+                                    :
+                                    null
+                                }
+                                {letter.value}
+                              </div>
                             </div>
                           </td>
                         )
@@ -176,7 +182,7 @@ class App extends Component {
               }
             </tbody>
           </table>
-          <div class="buttons" >
+          <div className="buttons" >
             <button onClick={this.updatePath.bind(this)} >RESET PATH</button>
             <h3>
               {
@@ -188,7 +194,7 @@ class App extends Component {
         </div>
         <div className="right">
           <div class="header" >
-            <h3>ADD WORDS HERE</h3>
+            {/* <h3>ADD WORDS HERE</h3> */}
             <input
               value={this.state.input.toUpperCase()}
               onChange={this.handleChange.bind(this, 'input')}
@@ -218,7 +224,7 @@ class App extends Component {
               })
             }
           </div>
-          {/* <button onClick={this.validateWords.bind(this)} >VALIDATE WORDS</button> */}
+          <button onClick={this.validateWords.bind(this)} >VALIDATE WORDS</button>
         </div>
       </div>
     );

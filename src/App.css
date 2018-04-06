@@ -29,8 +29,9 @@
 .header {
   width: calc(100% - 32px);
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+  /* flex-direction: column; */
+  /* justify-content: center; */
+  justify-content: space-around;
   align-items: center;
   background: #14C;
   padding: 16px;
@@ -43,11 +44,15 @@
   border-radius: 8px;
   display: flex;
   flex-flow: row wrap;
+  /* justify-content: space-between; */
   background: #EEE;
 }
 
 .right button {
-  background: #EA2;
+  /* background: #EA2; */
+  background: #14C;
+  color: #DDD;
+  /* color: #FC0; */
   padding: 6px;
   margin: 4px;
   border-radius: 4px;
@@ -66,7 +71,8 @@
 }
 
 .buttons button, .header button {
-  background-image: linear-gradient(80deg, #DA2, #FD2);
+  background-image: linear-gradient(20deg, #DA2, #FD2);
+  color: #222;
   padding: 8px;
   border-radius: 6px;
   font-weight: bold;
@@ -74,7 +80,8 @@
 }
 
 button.selected {
-  background: #EC2;
+  /* background: #EC2; */
+  background: #26E;
 }
 
 #board {
@@ -164,7 +171,7 @@ button.selected {
   left: 2px;
 }
 
-.invalid {
+button.invalid {
   color: red;
 }
 

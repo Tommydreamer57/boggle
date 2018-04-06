@@ -1,33 +1,33 @@
-function getRandomLetter(previousLetters = []) {
+function getRandomLetter(previousLetters = [], dimension = 0) {
     // SCRABBLE
-    // const lettersObj = {
-    //     A: 13,
-    //     B: 3,
-    //     C: 3,
-    //     D: 6,
-    //     E: 18,
-    //     F: 3,
-    //     G: 4,
-    //     H: 3,
-    //     I: 12,
-    //     J: 2,
-    //     K: 2,
-    //     L: 5,
-    //     M: 3,
-    //     N: 8,
-    //     O: 11,
-    //     P: 3,
-    //     Qu: 2,
-    //     R: 9,
-    //     S: 6,
-    //     T: 9,
-    //     U: 6,
-    //     V: 3,
-    //     W: 3,
-    //     X: 2,
-    //     Y: 3,
-    //     Z: 2
-    // };
+    const scrabble = {
+        A: 13,
+        B: 3,
+        C: 3,
+        D: 6,
+        E: 18,
+        F: 3,
+        G: 4,
+        H: 3,
+        I: 12,
+        J: 2,
+        K: 2,
+        L: 5,
+        M: 3,
+        N: 8,
+        O: 11,
+        P: 3,
+        Qu: 2,
+        R: 9,
+        S: 6,
+        T: 9,
+        U: 6,
+        V: 3,
+        W: 3,
+        X: 2,
+        Y: 3,
+        Z: 2
+    };
     // BOGGLE
     const lettersObj = {
         A: 12,
@@ -57,6 +57,62 @@ function getRandomLetter(previousLetters = []) {
         Y: 3,
         Z: 1
     };
+    // BOGGLE FIVE BY FIVE
+    const fiveByFive = [
+        "aaafrs",
+        "aaeeee",
+        "aafirs",
+        "adennn",
+        "aeeeem",
+        "aeegmu",
+        "aegmnn",
+        "afirsy",
+        "bjkqxz",
+        "ccenst",
+        "ceiilt",
+        "ceilpt",
+        "ceipst",
+        "ddhnot",
+        "dhhlor",
+        "dhlnor",
+        "dhlnor",
+        "eiiitt",
+        "emottt",
+        "ensssu",
+        "fiprsy",
+        "gorrvw",
+        "iprrry",
+        "nootuw",
+        "ooottu",
+    ]
+    // BOGGLE FIVE BY FIVE
+    const otherFiveByFive = [
+        "AAAFRS",
+        "AAEEEE",
+        "AAFIRS",
+        "ADENNN",
+        "AEEEEM",
+        "AEEGMU",
+        "AEGMNN",
+        "AFIRSY",
+        "BJKQXZ",
+        "CCNSTW",
+        "CEIILT",
+        "CEILPT",
+        "CEIPST",
+        "DHHNOT",
+        "DHHLOR",
+        "DHLNOR",
+        "DDLNOR",
+        "EIIITT",
+        "EMOTTT",
+        "ENSSSU",
+        "FIPRSY",
+        "GORRVW",
+        "HIPRRY",
+        "NOOTUW",
+        "OOOTTU"
+    ]
     previousLetters.forEach(letter => {
         lettersObj[letter]--;
     });
