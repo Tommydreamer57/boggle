@@ -3,15 +3,17 @@ import logo from './logo.svg';
 import './App.css';
 import Boggle from './components/Boggle';
 
+const defaultDimension = 5
+
 class App extends Component {
   constructor() {
     super();
 
-    const boggle = new Boggle(4);
+    const boggle = new Boggle(defaultDimension);
 
     this.state = {
       boggle,
-      dimension: 4,
+      dimension: defaultDimension,
       input: '',
       words: []
     }
@@ -20,7 +22,7 @@ class App extends Component {
   componentDidMount() {
     window.addEventListener('keydown', e => e.key === 'Enter' ? this.addWord.call(this, this.state.input) : null);
   }
-  resetBoard(dimension = 4) {
+  resetBoard(dimension = defaultDimension) {
     console.log(arguments);
     const boggle = new Boggle(dimension);
     const input = '';
@@ -87,7 +89,11 @@ class App extends Component {
       boggle.resetPath();
     } else {
       const { validations } = word;
-      if (!validations.length) return;
+      if (!validations.length) {
+        input = '';
+        boggle.resetPath();
+        return;
+      }
       let index = validations.indexOf(path);
       boggle.path = word.validations[index + 1] || word.validations[0];
       input = boggle.path.map(letter => letter.value.toUpperCase()).join('');
@@ -111,10 +117,10 @@ class App extends Component {
 
     input = boggle.path.map(letter => letter.value.toUpperCase()).join('');
 
-      this.setState({
-        ...this.state,
-        input
-      });
+    this.setState({
+      ...this.state,
+      input
+    });
   }
   render() {
     const { boggle, words } = this.state;
@@ -192,15 +198,24 @@ class App extends Component {
           </div>
           <div class="body" >
             {
-              words.map(word => (
-                <button
-                  className={`word ${word.validations.length ? 'valid' : 'invalid'}`}
-                  onClick={this.updatePath.bind(this, word)}
-                >
-                  {word.value.toUpperCase() + ' (' + word.validations.length + ')'}
-                  {word.validations.indexOf(path) + 1 ? ' - (' + (word.validations.indexOf(path) + 1) + ')' : ''}
-                </button>
-              ))
+              !words.length ?
+                <button className="word" >Your words will show up here...</button>
+                :
+                null
+            }
+            {
+              words.map(word => {
+                let selected = word.validations.includes(path);
+                return (
+                  <button
+                    className={`word ${word.validations.length ? 'valid' : 'invalid'} ${selected ? 'selected' : ''}`}
+                    onClick={this.updatePath.bind(this, word)}
+                  >
+                    {word.value.toUpperCase() + ' (' + word.validations.length + ')'}
+                    {word.validations.indexOf(path) + 1 ? ' - (' + (word.validations.indexOf(path) + 1) + ')' : ''}
+                  </button>
+                )
+              })
             }
           </div>
           {/* <button onClick={this.validateWords.bind(this)} >VALIDATE WORDS</button> */}

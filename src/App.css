@@ -27,17 +27,31 @@
 }
 
 .header {
-  width: 100%;
+  width: calc(100% - 32px);
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  background: #14C;
+  padding: 16px;
+  border-radius: 8px;
 }
 
 .body {
-  padding: 16px 0;
+  margin: 16px 0;
+  padding: 8px;
+  border-radius: 8px;
   display: flex;
   flex-flow: row wrap;
+  background: #EEE;
+}
+
+.right button {
+  background: #EA2;
+  padding: 6px;
+  margin: 4px;
+  border-radius: 4px;
+  font-weight: bold;
 }
 
 .buttons {
@@ -49,6 +63,18 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.buttons button, .header button {
+  background-image: linear-gradient(80deg, #DA2, #FD2);
+  padding: 8px;
+  border-radius: 6px;
+  font-weight: bold;
+  width: 130px;
+}
+
+button.selected {
+  background: #EC2;
 }
 
 #board {
