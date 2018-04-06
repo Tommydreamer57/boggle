@@ -152,7 +152,9 @@ class Boggle {
 
         this.board = boggle;
         // this.path = [this.board[0][0]];
-        this.path = [new Letter()];
+        const letter = new Letter();
+        letter.value = '';
+        this.path = [letter];
         this.dimensions = { x, y };
     }
     get currentWord() {
@@ -272,7 +274,9 @@ class Boggle {
         }
     }
     resetPath() {
-        this.path = [new Letter()];
+        const letter = new Letter();
+        letter.value = '';
+        this.path = [letter];
     }
 }
 

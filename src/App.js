@@ -17,6 +17,9 @@ class App extends Component {
     }
 
   }
+  componentDidMount() {
+    window.addEventListener('keydown', e => e.key === 'Enter' ? this.addWord.call(this, this.state.input) : null);
+  }
   resetBoard(dimension = 4) {
     console.log(arguments);
     const boggle = new Boggle(dimension);
