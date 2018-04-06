@@ -87,6 +87,7 @@ class App extends Component {
       if (!validations.length) return;
       let index = validations.indexOf(path);
       boggle.path = word.validations[index + 1] || word.validations[0];
+      input = boggle.path.map(letter => letter.value.toUpperCase()).join('');
     }
     console.log(input);
     this.setState({
@@ -95,7 +96,7 @@ class App extends Component {
     })
   }
   handleClick(coordinates, e) {
-    const { boggle } = this.state;
+    let { boggle, input } = this.state;
     const { board, path } = boggle;
     const { x, y } = coordinates;
     const destination = board[y][x]
@@ -105,7 +106,12 @@ class App extends Component {
     if (!available) boggle.start(coordinates);
     else boggle.move(coordinates);
 
-    this.setState(this.state);
+    input = boggle.path.map(letter => letter.value.toUpperCase()).join('');
+
+      this.setState({
+        ...this.state,
+        input
+      });
   }
   render() {
     const { boggle, words } = this.state;
@@ -165,7 +171,7 @@ class App extends Component {
             <button onClick={this.updatePath.bind(this)} >RESET PATH</button>
             <h3>
               {
-                path.map(letter => letter.value)
+                path.map(letter => letter.value.toUpperCase())
               }
             </h3>
             <button onClick={this.addWord.bind(this, path.map(letter => letter.value).join(''), true)} >ADD WORD</button>

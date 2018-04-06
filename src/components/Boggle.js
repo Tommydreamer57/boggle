@@ -152,7 +152,7 @@ class Boggle {
 
         this.board = boggle;
         // this.path = [this.board[0][0]];
-        this.path = [{ adjacentLetterObjects: [] }];
+        this.path = [new Letter()];
         this.dimensions = { x, y };
     }
     get currentWord() {
@@ -164,6 +164,8 @@ class Boggle {
             else arr.push(val);
             return arr;
         }, []);
+
+        console.log(word);
 
         function walkPath(currentLetter, validPaths, currentPath = []) {
 
@@ -181,7 +183,7 @@ class Boggle {
 
             findNextLetters: for (let prop in currentLetter) {
                 if (validDirections.includes(prop) && currentLetter[prop]) {
-                    if (currentLetter[prop].value === nextLetter && !currentPath.includes(currentLetter[prop])) {
+                    if (currentLetter[prop].value.toUpperCase() === nextLetter && !currentPath.includes(currentLetter[prop])) {
                         nextPaths.push(currentLetter[prop]);
                     }
                 }
@@ -270,7 +272,7 @@ class Boggle {
         }
     }
     resetPath() {
-        this.path = [{ adjacentLetterObjects: [] }];
+        this.path = [new Letter()];
     }
 }
 
