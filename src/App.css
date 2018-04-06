@@ -2,18 +2,52 @@
 .App {
   display: flex;
   justify-content: space-around;
+  align-items: flex-start;
+}
+
+.left {
+  height: calc(100vh - 32px);
+  width: 50%;
+  padding: 16px;
+  margin: 0 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   align-items: center;
 }
 
 .right {
+  position: relative;
+  height: calc(100vh - 32px);
+  width: 50%;
+  padding: 16px;
   display: flex;
   flex-direction: column;
+  overflow-y: scroll;
 }
 
-.center {
+.header {
+  width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: center;
+}
+
+.body {
+  padding: 16px 0;
+  display: flex;
+  flex-flow: row wrap;
+}
+
+.buttons {
+  background: #14C;
+  border-radius: 8px;
+  margin: 16px 0;
+  padding: 16px 10px;
+  width: calc(100% - 20px);
+  display: flex;
+  justify-content: space-between;
   align-items: center;
 }
 
@@ -67,20 +101,23 @@
   font-size: 32px;
   background: #EEE;
   color: #222;
-  transition: background-color 0.2s;
+  transition: 0.2s;
 }
 
 .used {
   background: yellow;
   opacity: .875;
+  animation: pulse 0.2s 1;
 }
 
 .last {
   background: yellow;
+  animation: pulse 0.2s 1;
 }
 
 .available {
   background: orange;
+  animation: pulse 0.2s 1;
 }
 
 .letter:hover {
@@ -103,4 +140,46 @@
 
 .invalid {
   color: red;
+}
+
+
+
+
+
+
+
+@keyframes pulse {
+  from {
+    height: calc(100% - 6px);
+    width: calc(100% - 6px);
+    margin: 3px;
+  }
+  50% {
+    height: calc(100% - 3px);
+    width: calc(100% - 3px);
+    margin: 1.5px;
+  }
+  to {
+    height: calc(100% - 6px);
+    width: calc(100% - 6px);
+    margin: 3px;
+  }
+}
+
+@keyframes small-pulse {
+  from {
+    height: calc(100% - 6px);
+    width: calc(100% - 6px);
+    margin: 3px;
+  }
+  50% {
+    height: calc(100% - 4px);
+    width: calc(100% - 4px);
+    margin: 2px;
+  }
+  to {
+    height: calc(100% - 6px);
+    width: calc(100% - 6px);
+    margin: 3px;
+  }
 }

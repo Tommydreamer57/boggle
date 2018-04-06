@@ -44,7 +44,18 @@ table {
 }
 
 body {
+  max-height: 100vh;
   margin: 0;
   padding: 0;
   font-family: sans-serif;
+  background: #AAA;
+  overflow: hidden;
+}
+
+button {
+	background: none;
+	border: none;
+	outline: none;
+	margin: 4px;
+	padding: 4px;
 }

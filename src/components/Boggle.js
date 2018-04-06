@@ -1,46 +1,80 @@
-function getRandomLetter() {
+function getRandomLetter(previousLetters = []) {
+    // SCRABBLE
+    // const lettersObj = {
+    //     A: 13,
+    //     B: 3,
+    //     C: 3,
+    //     D: 6,
+    //     E: 18,
+    //     F: 3,
+    //     G: 4,
+    //     H: 3,
+    //     I: 12,
+    //     J: 2,
+    //     K: 2,
+    //     L: 5,
+    //     M: 3,
+    //     N: 8,
+    //     O: 11,
+    //     P: 3,
+    //     Qu: 2,
+    //     R: 9,
+    //     S: 6,
+    //     T: 9,
+    //     U: 6,
+    //     V: 3,
+    //     W: 3,
+    //     X: 2,
+    //     Y: 3,
+    //     Z: 2
+    // };
+    // BOGGLE
     const lettersObj = {
-        A: 13,
-        B: 3,
-        C: 3,
+        A: 12,
+        B: 1,
+        C: 5,
         D: 6,
-        E: 18,
-        F: 3,
-        G: 4,
-        H: 3,
-        I: 12,
-        J: 2,
-        K: 2,
+        E: 19,
+        F: 4,
+        G: 3,
+        H: 5,
+        I: 11,
+        J: 1,
+        K: 1,
         L: 5,
-        M: 3,
-        N: 8,
+        M: 4,
+        N: 11,
         O: 11,
-        P: 3,
-        Q: 2,
-        R: 9,
-        S: 6,
-        T: 9,
-        U: 6,
-        V: 3,
-        W: 3,
-        X: 2,
+        P: 4,
+        Qu: 1,
+        R: 12,
+        S: 9,
+        T: 13,
+        U: 4,
+        V: 1,
+        W: 2,
+        X: 1,
         Y: 3,
-        Z: 2
+        Z: 1
     };
+    previousLetters.forEach(letter => {
+        lettersObj[letter]--;
+    });
     const lettersArr = [];
     for (let prop in lettersObj) {
         for (let i = 0; i < lettersObj[prop]; i++) {
             lettersArr.push(prop);
         }
     }
+    console.log(lettersArr.join(''));
     return lettersArr[~~(Math.random() * lettersArr.length)];
 }
 
 const validDirections = ['up', 'down', 'left', 'right', 'upLeft', 'upRight', 'downLeft', 'downRight'];
 
 class Letter {
-    constructor(val) {
-        if (!val) val = getRandomLetter();
+    constructor(val, previousLetters) {
+        if (!val) val = getRandomLetter(previousLetters);
         this.value = val;
     }
     get adjacentLetters() {
@@ -81,10 +115,14 @@ class Boggle {
         // 	['U', 'P', 'K', 'B', 'A', 'B'],
         // ];
 
+        const previousLetters = [];
+
         for (let i = 0; i < y; i++) {
             const row = [];
             for (let j = 0; j < x; j++) {
-                row.push(new Letter());
+                const letter = new Letter(null, previousLetters);
+                previousLetters.push(letter.value);
+                row.push(letter);
             }
             boggle.push(row);
         }
@@ -113,16 +151,21 @@ class Boggle {
         }
 
         this.board = boggle;
-        this.path = [this.board[0][0]];
+        // this.path = [this.board[0][0]];
+        this.path = [{ adjacentLetterObjects: [] }];
         this.dimensions = { x, y };
     }
     get currentWord() {
         return this.path.map(letter => letter.value).join('');
     }
     validate(word) {
-        word = word.toUpperCase().split('');
+        word = word.toUpperCase().split('').reduce((arr, val) => {
+            if (arr[arr.length - 1] === "Q" && val === "U") arr[arr.length - 1] += val;
+            else arr.push(val);
+            return arr;
+        }, []);
 
-        function walkPath(startingLetter, currentLetter, validPaths, currentPath = []) {
+        function walkPath(currentLetter, validPaths, currentPath = []) {
 
             currentPath.push(currentLetter);
 
@@ -145,7 +188,7 @@ class Boggle {
             }
 
             nextPaths.forEach(currentLetter => {
-                walkPath(startingLetter, currentLetter, validPaths, [...currentPath]);
+                walkPath(currentLetter, validPaths, [...currentPath]);
             });
 
             return validPaths;
@@ -161,14 +204,14 @@ class Boggle {
 
             findStartingIndices:
             for (let x = 0; x < row.length; x++) {
-                if (row[x].value === word[0]) {
+                if (row[x].value.toUpperCase() === word[0]) {
                     startingPoints.push(row[x]);
                 }
             }
         }
 
         startingPoints.forEach(startingLetter => {
-            walkPath(startingLetter, startingLetter, validPaths);
+            walkPath(startingLetter, validPaths);
         });
 
         // if (!validPaths.length) return false;
@@ -194,11 +237,20 @@ class Boggle {
 
             const { x, y } = direction;
 
-            if (!this.path[this.path.length - 1].adjacentLetterObjects.some(letter => letter.coordinates.x === x && letter.coordinates.y === y)) throw new Error('invalid destination');
-
             const nextLetter = this.board[y][x];
 
-            if (this.path.includes(nextLetter)) throw new Error('letter already used: ' + nextLetter.value);
+            if (this.path[0] === nextLetter) {
+                this.resetPath();
+                return this;
+            }
+
+            if (this.path.includes(nextLetter)) {
+                this.path = this.path.slice(0, this.path.indexOf(nextLetter));
+                return this;
+            }
+
+            if (!this.path[this.path.length - 1].adjacentLetterObjects.some(letter => letter.coordinates.x === x && letter.coordinates.y === y)) throw new Error('invalid destination');
+
 
             this.path.push(nextLetter);
 
@@ -216,6 +268,9 @@ class Boggle {
 
             return this;
         }
+    }
+    resetPath() {
+        this.path = [{ adjacentLetterObjects: [] }];
     }
 }
 
