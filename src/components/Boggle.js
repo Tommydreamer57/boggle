@@ -171,7 +171,7 @@ class Boggle {
             walkPath(startingLetter, startingLetter, validPaths);
         });
 
-        if (!validPaths.length) return false;
+        // if (!validPaths.length) return false;
 
         return validPaths;
     }

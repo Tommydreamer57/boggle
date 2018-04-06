@@ -33,6 +33,15 @@ class App extends Component {
     this.setState({
       [prop]: e.target.value
     })
+    if (prop === 'input') {
+      const value = e.target.value.toUpperCase();
+      const validations = this.state.boggle.validate(value);
+      const word = {
+        value,
+        validations
+      };
+      this.updatePath(word);
+    }
   }
   addWord(word, reset) {
     if (!word) return;
@@ -53,6 +62,7 @@ class App extends Component {
       update.words = [...this.state.words, word];
     }
     this.setState({ ...update });
+    this.updatePath(word);
   }
   validateWords() {
     const { boggle, words } = this.state;
@@ -66,7 +76,7 @@ class App extends Component {
     const { boggle } = this.state;
     const { path } = boggle;
     const { validations } = word;
-    if (!validations) return;
+    if (!validations.length) return;
     let index = validations.indexOf(path);
     boggle.path = word.validations[index + 1] || word.validations[0];
     this.setState({
@@ -155,10 +165,11 @@ class App extends Component {
           {
             words.map(word => (
               <button
-                className={`word ${word.validations ? 'valid' : 'invalid'}`}
+                className={`word ${word.validations.length ? 'valid' : 'invalid'}`}
                 onClick={this.updatePath.bind(this, word)}
               >
-                {word.value.toUpperCase()}
+                {word.value.toUpperCase() + ' (' + word.validations.length + ')'}
+                {word.validations.indexOf(path) + 1 ? ' - (' + (word.validations.indexOf(path) + 1) + ')' : ''}
               </button>
             ))
           }
