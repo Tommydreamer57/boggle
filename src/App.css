@@ -67,6 +67,7 @@
   font-size: 32px;
   background: #EEE;
   color: #222;
+  transition: background-color 0.2s;
 }
 
 .used {
@@ -98,4 +99,8 @@
   align-items: center;
   top: 2px;
   left: 2px;
+}
+
+.invalid {
+  color: red;
 }

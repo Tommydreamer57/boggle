@@ -17,10 +17,17 @@ class App extends Component {
     }
 
   }
-  resetBoard(n) {
+  resetBoard(dimension = 6) {
     console.log(arguments);
-    const boggle = new Boggle(n || 6);
-    this.setState({ boggle });
+    const boggle = new Boggle(dimension);
+    const input = '';
+    const words = [];
+    this.setState({
+      boggle,
+      input,
+      words,
+      dimension
+    });
   }
   handleChange(prop, e) {
     this.setState({
@@ -28,26 +35,43 @@ class App extends Component {
     })
   }
   addWord(word, reset) {
+    if (!word) return;
+    word = word.toUpperCase();
     const update = {};
     if (reset) {
       update.boggle = this.state.boggle;
       update.boggle.start(0, 0);
-    }
-    else {
+    } else {
       update.input = '';
     }
-    this.setState({
-      words: [...this.state.words, word],
-      ...update
-    })
+    if (!this.state.words.some(obj => obj.value === word)) {
+      const validations = this.state.boggle.validate(word);
+      word = {
+        value: word,
+        validations
+      }
+      update.words = [...this.state.words, word];
+    }
+    this.setState({ ...update });
   }
   validateWords() {
     const { boggle, words } = this.state;
     const validations = [];
     words.forEach(word => {
-      validations.push(boggle.validate(word));
+      validations.push(boggle.validate(word.value));
     });
     console.log(validations);
+  }
+  updatePath(word) {
+    const { boggle } = this.state;
+    const { path } = boggle;
+    const { validations } = word;
+    if (!validations) return;
+    let index = validations.indexOf(path);
+    boggle.path = word.validations[index + 1] || word.validations[0];
+    this.setState({
+      boggle
+    })
   }
   handleClick(coordinates, e) {
     const { boggle } = this.state;
@@ -75,6 +99,7 @@ class App extends Component {
             type='number'
             value={this.state.dimension}
             onChange={this.handleChange.bind(this, 'dimension')}
+            onKeyDown={e => e.key === 'Enter' ? this.resetBoard.call(this, this.state.dimension) : null}
           />
           <button onClick={this.resetBoard.bind(this, this.state.dimension)} >UPDATE BOARD</button>
           <table id="board" >
@@ -124,11 +149,17 @@ class App extends Component {
           <input
             value={this.state.input}
             onChange={this.handleChange.bind(this, 'input')}
+            onKeyDown={e => e.key === 'Enter' ? this.addWord.call(this, this.state.input) : null}
           />
           <button onClick={this.addWord.bind(this, this.state.input)} >ADD WORD</button>
           {
             words.map(word => (
-              <h4>{word.toUpperCase()}</h4>
+              <button
+                className={`word ${word.validations ? 'valid' : 'invalid'}`}
+                onClick={this.updatePath.bind(this, word)}
+              >
+                {word.value.toUpperCase()}
+              </button>
             ))
           }
           <button onClick={this.validateWords.bind(this)} >VALIDATE WORDS</button>
