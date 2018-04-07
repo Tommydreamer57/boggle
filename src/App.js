@@ -25,6 +25,10 @@ class App extends Component {
   }
   componentDidMount() {
     window.addEventListener('keydown', e => e.key === 'Enter' ? this.addWord.call(this, this.state.input) : null);
+    axios.get('/api/cache').then(response => {
+      const cache = response.data;
+      this.setState({ cache });
+    });
   }
   resetBoard(dimension = defaultDimension) {
     console.log(arguments);

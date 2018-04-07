@@ -68,3 +68,37 @@
     //     console.log(err.response.data);
     //     res.status(200).send(err);
     // });
+
+
+// URI=mongodb+srv://Tommydreamer57:atomlao99@tommydreamer57-pjw98.mongodb.net/test
+// DBNAME=Tommydreamer57
+
+// CLOUD_KEY=665776219848248
+// CLOUD_SECRET=8DYB4Pi7NlTa94ezpF4HymTADdE
+// CLOUD_ENV=cloudinary://665776219848248:8DYB4Pi7NlTa94ezpF4HymTADdE@tommydreamer57/
+
+// SECRET=svnkdfjerghuijwofkslcdnvjferghuiwjfakmskldowefjihruvnjdsk
+
+// AUTH_DOMAIN=tommydreamer57.auth0.com
+// AUTH_CLIENT_ID=R5NNVySVAW1BaxabH9b4dtZCXItgtajf
+// AUTH_CLIENT_SECRET=AJRQleUABEePIz4Pmb-MpRPiAhmPpZJW4L03wgLMGujYuYVjR27uOwtP3XAXGBi8
+
+// CALLBACK_URL=http://localhost:8070/auth/callback
+
+// SUCCESS_REDIRECT=http://localhost:8080/#/dashboard
+// FAILURE_REDIRECT=http://localhost:8080/#/
+
+
+// const MongoClient = require('mongodb').MongoClient;
+
+// // MONGODB CONNECTION
+
+// // CONNECTION
+// MongoClient.connect(URI, function (err, client) {
+//     const db = client.db(DBNAME);
+//     app.set('db', db);
+//     // console.log(db.listCollections({}));
+//     console.log(`${DBNAME} connected to server`);
+//     app.listen(PORT, () => console.log(`Resume Review listening on port ${PORT}`));
+// });
+
