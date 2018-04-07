@@ -181,7 +181,7 @@ class App extends Component {
       <div className="App" >
         <div className="left" >
           <div className="buttons" >
-            <button onClick={this.resetBoard.bind(this, 6)} >RESET BOARD</button>
+            <button onClick={this.resetBoard.bind(this, defaultDimension)} >RESET BOARD</button>
             <input
               type='number'
               min={3}
@@ -231,11 +231,11 @@ class App extends Component {
           </table>
           <div className="buttons" >
             <button onClick={this.updatePath.bind(this)} >RESET PATH</button>
-            <h3>
+            {/* <h3>
               {
                 path.map(letter => letter.value.toUpperCase())
               }
-            </h3>
+            </h3> */}
             <button onClick={this.addWord.bind(this, path.map(letter => letter.value).join(''), true)} >ADD WORD</button>
           </div>
         </div>
@@ -272,8 +272,10 @@ class App extends Component {
               })
             }
           </div>
-          <button onClick={this.validateWords.bind(this)} >VALIDATE WORDS</button>
-          <button onClick={this.resetValidations.bind(this)} >RESET VALIDATIONS</button>
+          <div className="right-buttons" >
+            <button onClick={this.validateWords.bind(this)} >VALIDATE WORDS</button>
+            <button onClick={this.resetValidations.bind(this)} >RESET VALIDATIONS</button>
+          </div>
         </div>
       </div>
     );
