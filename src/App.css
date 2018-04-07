@@ -12,7 +12,7 @@
   margin: 0 16px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
 }
 
@@ -142,8 +142,10 @@ button.invalid {
 #board {
   background: #14C;
   border-radius: 8px;
-  width: 400px;
-  height: 400px;
+  /* width: 400px; */
+  /* height: 400px; */
+  width: calc(400px + 300 * (100vw - 769px) / 2048);
+  height: calc(400px + 300 * (100vw - 769px) / 2048);
   padding: 4px;
   display: flex;
   justify-content: space-around;
