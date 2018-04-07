@@ -140,7 +140,8 @@ class App extends Component {
   }
   render() {
     const { boggle, words, oxfordValidations, validating } = this.state;
-    const { board, path } = boggle;
+    const { board, path, dimensions } = boggle;
+    const { x: size } = dimensions;
     console.log(this.state);
 
     const mappedWords = words.map((word, i) => {
