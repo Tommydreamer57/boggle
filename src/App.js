@@ -18,6 +18,7 @@ class App extends Component {
       input: '',
       words: [],
       oxfordValidations: [],
+      cache: [],
       validating: false
     }
 
@@ -75,19 +76,21 @@ class App extends Component {
     this.updatePath();
   }
   validateWords() {
-    let { words, oxfordValidations } = this.state;
+    let { words, oxfordValidations, cache } = this.state;
 
     words = words.filter(word => {
       let valid = word.validations.length;
-      let tested = oxfordValidations.some(validation => validation.id.toUpperCase() === word.value.toUpperCase());
+      let tested = cache.some(validation => validation.value.toUpperCase() === word.value.toUpperCase());
       return valid && !tested;
     }).map(word => word.value);
 
     this.setState({ validating: true });
+
     axios.post('/api/validate', { words }).then(response => {
       console.log(response.data);
-      oxfordValidations = [...oxfordValidations, ...response.data];
-      setTimeout(() => this.setState({ oxfordValidations, validating: false }), 500);
+      cache = [...cache, ...response.data];
+      oxfordValidations = cache;
+      setTimeout(() => this.setState({ cache, oxfordValidations, validating: false }), 500);
     });
   }
   resetValidations() {
@@ -149,10 +152,10 @@ class App extends Component {
       let valid = word.validations.length > 0;
       let tested = false;
       let defined = false;
-      let oxfordValidation = oxfordValidations.find(validation => validation.id.toUpperCase() === word.value.toUpperCase());
+      let oxfordValidation = oxfordValidations.find(validation => validation.value.toUpperCase() === word.value.toUpperCase());
       if (oxfordValidation) {
         tested = true
-        defined = !oxfordValidation.failed;
+        defined = oxfordValidation.defined;
       }
       return {
         ...word,
