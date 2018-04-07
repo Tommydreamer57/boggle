@@ -79,9 +79,64 @@
   width: 130px;
 }
 
+button.valid {
+
+}
+
+button.defined {
+  background: #1D3;
+  color: #222;
+}
+
+button.undefined {
+  background: red;
+  color: #222;
+}
+
 button.selected {
-  /* background: #EC2; */
-  background: #26E;
+  opacity: 0.675;
+}
+
+button.untested {
+  background: #14C;
+  color: #DDD;
+}
+
+button.invalid {
+  color: red;
+}
+
+.validating button {
+  opacity: 0.5;
+  /* background: white; */
+  animation-name: button-pulse;
+  animation-duration: 0.6s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+
+.validating button:nth-of-type(6n - 5) {
+  animation-delay: 0
+}
+
+.validating button:nth-of-type(6n - 4) {
+  animation-delay: 0.1s;
+}
+
+.validating button:nth-of-type(6n - 3) {
+  animation-delay: 0.2s;
+}
+
+.validating button:nth-of-type(6n - 2) {
+  animation-delay: 0.3s;
+}
+
+.validating button:nth-of-type(6n - 1) {
+  animation-delay: 0.4s;
+}
+
+.validating button:nth-of-type(6n) {
+  animation-delay: 0.5s;
 }
 
 #board {
@@ -171,10 +226,6 @@ button.selected {
   left: 2px;
 }
 
-button.invalid {
-  color: red;
-}
-
 
 
 
@@ -214,5 +265,20 @@ button.invalid {
     height: calc(100% - 6px);
     width: calc(100% - 6px);
     margin: 3px;
+  }
+}
+
+@keyframes button-pulse {
+  from {
+    padding: 6px;
+    margin: 4px;
+  }
+  50% {
+    padding: 8px;
+    margin: 2px;
+  }
+  to {
+    padding: 6px;
+    margin: 4px;
   }
 }

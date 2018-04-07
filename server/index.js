@@ -9,36 +9,42 @@ const {
     OXFORD_URL
 } = process.env
 
-const PORT = 3013;
 const app = express();
 app.use(bodyParser.json());
 
-app.get('/api/validate', (req, res) => {
+const PORT = 3013;
+const config = {
+    headers: {
+        APP_ID: OXFORD_APP_ID,
+        APP_KEY: OXFORD_APP_KEY
+    }
+};
+
+// axios.get(`${OXFORD_URL}/wordlist/en/word_length=>5,<7`, config).then(response => {
+//     console.log(response.data);
+// })
+
+app.post('/api/validate', (req, res) => {
     const { words } = req.body;
-    const config = {
-        headers: {
-            APP_ID: env.OXFORD_APP_ID,
-            APP_KEY: env.OXFORD_APP_KEY
-        }
-    };
+    console.log(words)
     const validations = [];
     words.forEach(word => {
-        const url = `${env.OXFORD_URL}/search/en?q=${word.value.toLowerCase()}`;
+        const url = `${OXFORD_URL}/entries/en/${word.toLowerCase()}`;
         axios.get(url, config).then(response => {
-            console.log(response.data);
-            validations.push(response.data);
+            if (response.data) validations.push(response.data.results[0]);
+        }).catch(err => {
+            console.log(err)
+            validations.push({ id: word.toLowerCase(), failed: true });
         });
     });
-    const intervals = 100;
-    function check() {
-        if (validations.length === words.length) {
+    function check(intervals) {
+        if (!intervals || validations.length === words.length) {
             res.status(200).send(validations);
         } else {
-            intervals--;
-            if (!intervals) clearInterval(id);
+            setTimeout(check.bind(null, intervals - 1), 500);
         }
     }
-    const id = setInterval(check, 500);
+    check(100);
 });
 
 app.listen(PORT, () => console.log(`Boggle listening on port ${PORT}`));

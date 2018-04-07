@@ -58,4 +58,6 @@ button {
 	outline: none;
 	margin: 4px;
 	padding: 4px;
+	transition: 0.3s;
+	box-shadow: 1px 1px 5px 2.5px rgba(32, 32, 32, 0.25);
 }

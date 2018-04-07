@@ -16,7 +16,9 @@ class App extends Component {
       boggle,
       dimension: defaultDimension,
       input: '',
-      words: []
+      words: [],
+      oxfordValidations: [],
+      validating: false
     }
 
   }
@@ -63,11 +65,11 @@ class App extends Component {
     }
     if (!this.state.words.some(obj => obj.value === word)) {
       const validations = this.state.boggle.validate(word);
-      word = {
+      const newWord = {
         value: word,
         validations
       }
-      update.words = [...this.state.words, word];
+      update.words = [newWord, ...this.state.words];
     }
     this.setState({ ...update });
     this.updatePath();
@@ -75,13 +77,23 @@ class App extends Component {
   validateWords() {
     const { boggle, words } = this.state;
     const validations = [];
-    
+
     words.forEach(word => {
       if (boggle.validate(word.value).length) {
-        validations.push(word);        
+        validations.push(word);
       }
     });
-    console.log(validations);
+    this.setState({ validating: true });
+    axios.post('/api/validate', { words: words.filter(word => word.validations.length).map(word => word.value) }).then(response => {
+      const oxfordValidations = response.data;
+      setTimeout(() => this.setState({ oxfordValidations, validating: false }), 500);
+    })
+  }
+  resetValidations() {
+    this.setState({
+      oxfordValidations: [],
+      validating: false
+    })
   }
   updatePath(word) {
     console.log(word);
@@ -127,9 +139,43 @@ class App extends Component {
     });
   }
   render() {
-    const { boggle, words } = this.state;
+    const { boggle, words, oxfordValidations, validating } = this.state;
     const { board, path } = boggle;
     console.log(this.state);
+
+    const mappedWords = words.map((word, i) => {
+      let selected = word.validations.includes(path);
+      let valid = word.validations.length > 0;
+      let tested = false;
+      let defined = false;
+      let oxfordValidation = oxfordValidations.find(validation => validation.id.toUpperCase() === word.value.toUpperCase());
+      if (oxfordValidation) {
+        tested = true
+        defined = !oxfordValidation.failed;
+      }
+      return {
+        ...word,
+        selected,
+        valid,
+        tested,
+        defined
+      }
+    });
+
+    const untestedWords = [];
+    const definedWords = [];
+    const undefinedWords = [];
+    const invalidWords = [];
+
+    mappedWords.forEach(word => {
+      if (!word.valid) return invalidWords.push(word);
+      if (!word.tested) return untestedWords.push(word);
+      if (!word.defined) return undefinedWords.push(word);
+      if (word.defined) return definedWords.push(word);
+    });
+
+    const wordsToDisplay = [...untestedWords, ...definedWords, ...undefinedWords, ...invalidWords];
+
     return (
       <div className="App" >
         <div className="left" >
@@ -193,7 +239,7 @@ class App extends Component {
           </div>
         </div>
         <div className="right">
-          <div class="header" >
+          <div className="header" >
             {/* <h3>ADD WORDS HERE</h3> */}
             <input
               value={this.state.input.toUpperCase()}
@@ -202,7 +248,7 @@ class App extends Component {
             />
             <button onClick={this.addWord.bind(this, this.state.input)} >ADD WORD</button>
           </div>
-          <div class="body" >
+          <div className={`body ${validating ? 'validating' : ''}`} >
             {
               !words.length ?
                 <button className="word" >Your words will show up here...</button>
@@ -210,11 +256,12 @@ class App extends Component {
                 null
             }
             {
-              words.map(word => {
-                let selected = word.validations.includes(path);
+              wordsToDisplay.map((word, i) => {
+                let { selected, valid, tested, defined } = word;
+                console.log(selected, valid, tested, defined);
                 return (
                   <button
-                    className={`word ${word.validations.length ? 'valid' : 'invalid'} ${selected ? 'selected' : ''}`}
+                    className={`word ${valid ? 'valid' : 'invalid'} ${selected ? 'selected' : ''} ${defined ? 'defined' : 'undefined'} ${tested ? '' : 'untested'}`}
                     onClick={this.updatePath.bind(this, word)}
                   >
                     {word.value.toUpperCase() + ' (' + word.validations.length + ')'}
@@ -225,6 +272,7 @@ class App extends Component {
             }
           </div>
           <button onClick={this.validateWords.bind(this)} >VALIDATE WORDS</button>
+          <button onClick={this.resetValidations.bind(this)} >RESET VALIDATIONS</button>
         </div>
       </div>
     );
