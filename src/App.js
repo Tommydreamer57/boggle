@@ -55,11 +55,12 @@ class App extends Component {
   }
   handleChange(prop, e) {
     console.log(prop, e.target.value);
+    let value = e.target.value;
+    if (prop === 'input') value = value.toUpperCase().trim();
     this.setState({
-      [prop]: e.target.value
+      [prop]: value
     })
     if (prop === 'input') {
-      const value = e.target.value.toUpperCase();
       const validations = this.state.boggle.validate(value);
       const word = {
         value,
