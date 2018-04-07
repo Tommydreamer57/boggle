@@ -35,6 +35,35 @@ const cache = {
             defined: true
         }
     ],
+    currentRequestId: -1,
+    currentRequests: [
+        {
+            id: -1,
+            value: "WORD",
+            promise: new Promise(resolve => {
+                setTimeout(() => {
+                    cache.currentRequests.splice(0, 1);
+                    resolve();
+                }, 0);
+            })
+        }
+    ],
+    cacheRequest(promise, word) {
+        if (this.currentRequests.includes(promise)) return;
+        const id = this.currentRequestId++;
+        const value = word.toUpperCase();
+        const request = {
+            id,
+            value,
+            promise
+        }
+        const removeCachedRequest = (response) => {
+            this.currentRequests.splice(this.currentRequests.indexOf(request), 1);
+            return response;
+        }
+        promise.then(removeCachedRequest);
+        this.currentRequests.push(request);
+    },
     validate(...words) {
         if (words.length === 1 && Array.isArray(words[0])) words = words[0];
         console.log(words);
@@ -47,7 +76,13 @@ const cache = {
             else {
                 console.log(`FETCHING WORD: ${wordString}`)
                 const url = `${OXFORD_URL}/entries/en/${wordString.toLowerCase()}`;
-                const request = axios.get(url, config).then(response => {
+
+                // CHECK CACHE FOR CURRENT REQUESTS
+                let request = this.currentRequests.find(request => request.value.toUpperCase() === wordString.toUpperCase());
+
+                if (request) request = request.promise;
+
+                if (!request) request = axios.get(url, config).then(response => {
                     // CHECK IF THE WORD HAS BEEN FOUND
                     var word = this.words.find(word => word.value.toUpperCase() === wordString.toUpperCase());
                     if (word) {
@@ -59,7 +94,7 @@ const cache = {
                             value: wordString,
                             defined: !!(response.data && response.data.results),
                         }
-                        console.log(`FETCHED WORD: ${wordString} - ${word.defined}`);                        
+                        console.log(`FETCHED WORD: ${wordString} - ${word.defined}`);
                         this.words.push(word);
                         return word;
                     }
@@ -68,7 +103,6 @@ const cache = {
                     var word = this.words.find(word => word.value.toUpperCase() === wordString.toUpperCase());
                     if (word) {
                         console.log(`FOUND WORD: ${wordString} - ${word.defined}`);
-                        return word;
                     }
                     else {
                         word = {
@@ -77,9 +111,10 @@ const cache = {
                         }
                         console.log(`FETCHED WORD: ${wordString} - ${word.defined}`);
                         this.words.push(word);
-                        return word;
                     }
+                    return word;
                 });
+                this.cacheRequest(request, wordString);
                 return request;
             }
         });
@@ -88,12 +123,13 @@ const cache = {
 }
 
 app.post('/api/validate', (req, res) => {
-    const words = req.body.words;
-    // CACHE
+    const { words } = req.body;
     cache.validate(words).then(results => {
         res.status(200).send(results);
+        console.log(cache);
     }).catch(err => {
         res.status(500).send(err);
+        console.log(cache);
     });
 });
 
