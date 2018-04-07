@@ -26,7 +26,10 @@ const PORT = 3013;
 
 // CONNECTION
 MongoClient.connect(MONGO_URI, function (err, client) {
-    if (err) console.log(err);
+    if (err) {
+        console.log(`ERROR CONNECTING TO MONGODB`);
+        console.log(err);
+    }
     const db = client.db(MONGO_DBNAME);
     // db.collection('boggle-words').drop();
     app.set('db', db);
