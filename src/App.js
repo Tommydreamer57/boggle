@@ -85,9 +85,10 @@ class App extends Component {
 
     this.setState({ validating: true });
     axios.post('/api/validate', { words }).then(response => {
+      console.log(response.data);
       oxfordValidations = [...oxfordValidations, ...response.data];
       setTimeout(() => this.setState({ oxfordValidations, validating: false }), 500);
-    })
+    });
   }
   resetValidations() {
     this.setState({
