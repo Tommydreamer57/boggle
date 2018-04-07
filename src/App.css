@@ -16,6 +16,10 @@
   align-items: center;
 }
 
+#divider {
+  margin: -16px;
+}
+
 .right {
   position: relative;
   height: calc(100vh - 64px);
@@ -92,6 +96,10 @@
   font-size: 16px;
 }
 
+.right-buttons button:hover {
+  cursor: pointer;
+}
+
 button.valid {
 
 }
@@ -157,8 +165,8 @@ button.invalid {
   border-radius: 8px;
   /* width: 400px; */
   /* height: 400px; */
-  width: calc(400px + 300 * (100vw - 769px) / 2048);
-  height: calc(400px + 300 * (100vw - 769px) / 2048);
+  width: calc(300px + 400 * (100vw - 769px) / 2048);
+  height: calc(300px + 400 * (100vw - 769px) / 2048);
   padding: 4px;
   display: flex;
   justify-content: space-around;
@@ -202,6 +210,7 @@ button.invalid {
   justify-content: center;
   align-items: center;
   font-size: 32px;
+  /* background-image: radial-gradient(circle, #EEE 65%, #AAA, #444); */
   background: #EEE;
   color: #222;
   transition: 0.2s;

@@ -75,24 +75,23 @@ class App extends Component {
     this.updatePath();
   }
   validateWords() {
-    const { boggle, words } = this.state;
-    const validations = [];
+    let { words, oxfordValidations } = this.state;
 
-    words.forEach(word => {
-      if (boggle.validate(word.value).length) {
-        validations.push(word);
-      }
-    });
+    words = words.filter(word => {
+      let valid = word.validations.length;
+      let tested = oxfordValidations.some(validation => validation.id.toUpperCase() === word.value.toUpperCase());
+      return valid && !tested;
+    }).map(word => word.value);
+
     this.setState({ validating: true });
-    axios.post('/api/validate', { words: words.filter(word => word.validations.length).map(word => word.value) }).then(response => {
-      const oxfordValidations = response.data;
+    axios.post('/api/validate', { words }).then(response => {
+      oxfordValidations = [...oxfordValidations, ...response.data];
       setTimeout(() => this.setState({ oxfordValidations, validating: false }), 500);
     })
   }
   resetValidations() {
     this.setState({
-      oxfordValidations: [],
-      validating: false
+      oxfordValidations: []
     })
   }
   updatePath(word) {
@@ -239,10 +238,12 @@ class App extends Component {
             <button onClick={this.addWord.bind(this, path.map(letter => letter.value).join(''), true)} >ADD WORD</button>
           </div>
         </div>
+        <div id="divider" />
         <div className="right">
           <div className="header" >
             {/* <h3>ADD WORDS HERE</h3> */}
             <input
+              placeholder="Type a word here..."
               value={this.state.input.toUpperCase()}
               onChange={this.handleChange.bind(this, 'input')}
               onKeyDown={e => e.key === 'Enter' ? this.addWord.call(this, this.state.input) : null}
