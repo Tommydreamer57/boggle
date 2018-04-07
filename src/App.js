@@ -76,7 +76,10 @@ class App extends Component {
     this.updatePath();
   }
   validateWords() {
-    let { words, oxfordValidations, cache } = this.state;
+    let { words, oxfordValidations, cache, validating } = this.state;
+
+    // PREVENT FREQUENT REQUESTS
+    if (validating) return;
 
     words = words.filter(word => {
       let valid = word.validations.length;
