@@ -10,7 +10,10 @@ const {
 } = process.env
 
 const app = express();
+
 app.use(bodyParser.json());
+
+app.use(express.static(`${__dirname}/../build`));
 
 const PORT = 3013;
 const config = {
@@ -45,6 +48,12 @@ app.post('/api/validate', (req, res) => {
         }
     }
     check(100);
+});
+
+const path = require('path');
+
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../build/index.html'));
 });
 
 app.listen(PORT, () => console.log(`Boggle listening on port ${PORT}`));
