@@ -22,9 +22,20 @@ class App extends Component {
       validating: false
     }
 
+    this.ctrl = false;
+
   }
   componentDidMount() {
-    window.addEventListener('keydown', e => e.key === 'Enter' ? this.addWord.call(this, this.state.input) : null);
+    function keyDown(e) {
+      if (e.key === 'Control' || e.metaKey) this.ctrl = true;
+      if (e.key === 'Enter' && this.ctrl) return this.validateWords.call(this);
+      if (e.key === 'Enter') this.addWord.call(this, this.state.input);
+    }
+    function keyUp(e) {
+      if (e.key === 'Control' || e.metaKey) this.ctrl = false;
+    }
+    window.addEventListener('keydown', keyDown.bind(this));
+    window.addEventListener('keyup', keyUp.bind(this));
     axios.get('/api/words').then(response => {
       const cache = response.data;
       this.setState({ cache });
@@ -160,7 +171,7 @@ class App extends Component {
       let tested = false;
       let defined = false;
       let oxfordValidation = oxfordValidations.find(validation => validation.value.toUpperCase() === word.value.toUpperCase());
-      if (oxfordValidation) {
+      if (oxfordValidation && valid) {
         tested = true
         defined = oxfordValidation.defined;
       }
