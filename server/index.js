@@ -24,6 +24,9 @@ const PORT = 3013;
 
 // MONGODB CONNECTION
 
+// COLLECTION
+const collection = 'boggle';
+
 // CONNECTION
 MongoClient.connect(MONGO_URI, function (err, client) {
     if (err) {
@@ -31,9 +34,7 @@ MongoClient.connect(MONGO_URI, function (err, client) {
         console.log(err);
     }
     const db = client.db(MONGO_DBNAME);
-    // db.collection('boggle-words').drop();
     app.set('db', db);
-    // console.log(db.listCollections({}));
     console.log(`${MONGO_DBNAME} connected to server`);
     app.listen(PORT, () => console.log(`Boggle listening on port ${PORT}`));
 });
@@ -46,6 +47,7 @@ const config = {
     }
 }
 
+// CACHE
 const cache = {
     words: [
         {
@@ -107,7 +109,7 @@ const cache = {
     },
     validate(...words) {
         if (words.length === 1 && Array.isArray(words[0])) words = words[0];
-        // console.log(words);
+        console.log(words);
         const validations = words.map(word => word.toUpperCase()).map(wordString => {
             // CHECK CACHE FOR WORD
             const cachedWord = this.words.find(word => word.value.toUpperCase() === wordString.toUpperCase());
@@ -126,12 +128,11 @@ const cache = {
                 else {
                     // CHECK DB FOR WORD
                     const db = app.get('db');
-                    const collection = 'boggle-words';
                     const query = { value: wordString }
                     const word = db.collection(collection).count(query).then(count => {
                         // console.log(count);
                         if (count) {
-                            // console.log(`FOUND DB WORD: ${wordString}`);
+                            console.log(`FOUND DB WORD: ${wordString}`);
                             // RETURN WORD FROM DB
                             const cursor = db.collection(collection).find(query);
                             const word = cursor.next();
@@ -216,9 +217,30 @@ const cache = {
 }
 
 // ENDPOINTS
+
+// GET ALL WORDS
+app.get('/api/words', (req, res) => {
+    const db = app.get('db');
+    db.collection(collection).find().toArray().then(words => {
+        res.status(200).send(words);
+    }).catch(err => {
+        res.status(500).send(err);
+    });
+});
+// GET SPECIFIC WORD
+app.get('/api/words/:word', (req, res) => {
+    let word = req.params.word;
+    cache.validate(word).then(results => {
+        res.status(200).send(results);
+    }).catch(err => {
+        res.status(500).send(err);
+    });
+});
+// GET CACHE
 app.get('/api/cache', (req, res) => {
     res.status(200).send(cache.words);
 });
+// VALIDATE WORDS
 app.post('/api/validate', (req, res) => {
     let { words } = req.body;
     cache.validate(words).then(results => {
