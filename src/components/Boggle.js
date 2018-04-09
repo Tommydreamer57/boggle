@@ -122,16 +122,16 @@ function getRandomLetter(previousLetters = [], dimension = 0) {
             lettersArr.push(prop);
         }
     }
-    console.log(lettersArr.join(''));
     return lettersArr[~~(Math.random() * lettersArr.length)];
 }
 
 const validDirections = ['up', 'down', 'left', 'right', 'upLeft', 'upRight', 'downLeft', 'downRight'];
 
 class Letter {
-    constructor(val, previousLetters) {
-        if (!val) val = getRandomLetter(previousLetters);
+    constructor(val, previousLetters = []) {
+        if (!val) val = getRandomLetter(previousLetters.map(letter => letter.value));
         this.value = val;
+        this.coordinates = {};
     }
     get adjacentLetters() {
         const letters = [];
@@ -154,65 +154,142 @@ class Letter {
 }
 
 class Boggle {
-    constructor(x, y) {
-        if (typeof x === 'object') var { x, y } = x;
-        if (!x && !y) throw new Error('Boggle requires dimensions, please specify x or y');
-        if (!y) y = x;
-        if (!x) x = y;
+    constructor() {
+        let board, x, y;
 
-        const boggle = [];
-
-        // const board = [
-        // 	['K', 'X', 'O', 'Z', 'V', 'F'],
-        // 	['B', 'A', 'M', 'L', 'H', 'R'],
-        // 	['V', 'U', 'Q', 'J', 'M', 'S'],
-        // 	['V', 'A', 'J', 'A', 'M', 'K'],
-        // 	['V', 'I', 'T', 'T', 'D', 'O'],
-        // 	['U', 'P', 'K', 'B', 'A', 'B'],
-        // ];
-
-        const previousLetters = [];
-
-        for (let i = 0; i < y; i++) {
-            const row = [];
-            for (let j = 0; j < x; j++) {
-                const letter = new Letter(null, previousLetters);
-                previousLetters.push(letter.value);
-                row.push(letter);
-            }
-            boggle.push(row);
+        if (Array.isArray(arguments[0])) {
+            board = arguments[0];
+            y = board.length;
+            x = board[0].length;
+        } else if (typeof arguments[0] === 'object') {
+            board = [];
+            x = arguments[0].x;
+            y = arguments[0].y;
+        } else {
+            board = [];
+            x = arguments[0];
+            y = arguments[1] || x;
+        }
+        if (!x && !y) {
+            // throw new Error('Boggle requires dimensions, please specify x or y');
+            // DEFAULT DIMENSIONS
+            x = y = 5;
         }
 
-        for (let i = 0; i < boggle.length; i++) {
-            let prevRow = boggle[i - 1] || [];
-            let row = boggle[i];
-            let nextRow = boggle[i + 1] || [];
+        // IF WE ARE GIVEN A BOARD
+        let previousLetters = [];
+        if (board.length) {
+            board = board.map(row => row.map(letter => {
+                const newLetter = new Letter(letter, previousLetters);
+                previousLetters.push(newLetter);
+                return newLetter;
+            }));
+        } else {
+            // IF WE ARE NOT GIVEN A BOARD
+            // CREATE A BOARD
+            for (let i = 0; i < y; i++) {
+                const row = [];
+                for (let j = 0; j < x; j++) {
+                    const newLetter = new Letter(null, previousLetters);
+                    previousLetters.push(newLetter);
+                    row.push(newLetter);
+                }
+                board.push(row);
+            }
+        }
+
+        for (let i = 0; i < board.length; i++) {
+            let prevRow = board[i - 1] || [];
+            let row = board[i];
+            let nextRow = board[i + 1] || [];
             for (let j = 0; j < row.length; j++) {
-                const letter = row[j];
+                let letter = row[j];
+                let left = row[j - 1];
+                let right = row[j + 1];
+                let up = prevRow[j];
+                let down = nextRow[j];
+                let upLeft = prevRow[j - 1];
+                let upRight = prevRow[j + 1];
+                let downLeft = nextRow[j - 1];
+                let downRight = nextRow[j + 1];
                 Object.assign(letter, {
-                    coordinates: {
-                        y: i,
-                        x: j
-                    },
-                    left: row[j - 1],
-                    right: row[j + 1],
-                    up: prevRow[j],
-                    down: nextRow[j],
-                    upLeft: prevRow[j - 1],
-                    upRight: prevRow[j + 1],
-                    downLeft: nextRow[j - 1],
-                    downRight: nextRow[j + 1]
+                    y: i,
+                    x: j,
+                    left,
+                    right,
+                    up,
+                    down,
+                    upLeft,
+                    upRight,
+                    downLeft,
+                    downRight,
                 });
             }
         }
 
-        this.board = boggle;
-        // this.path = [this.board[0][0]];
-        const letter = new Letter();
-        letter.value = '';
-        this.path = [letter];
+        this.board = board;
+        this.path = [new Letter(' ')];
         this.dimensions = { x, y };
     }
+    // constructor(x, y) {
+    //     if (typeof x === 'object') var { x, y } = x;
+    //     if (!x && !y) throw new Error('Boggle requires dimensions, please specify x or y');
+    //     if (!y) y = x;
+    //     if (!x) x = y;
+
+    //     const boggle = [];
+
+    //     // const board = [
+    //     // 	['K', 'X', 'O', 'Z', 'V', 'F'],
+    //     // 	['B', 'A', 'M', 'L', 'H', 'R'],
+    //     // 	['V', 'U', 'Q', 'J', 'M', 'S'],
+    //     // 	['V', 'A', 'J', 'A', 'M', 'K'],
+    //     // 	['V', 'I', 'T', 'T', 'D', 'O'],
+    //     // 	['U', 'P', 'K', 'B', 'A', 'B'],
+    //     // ];
+
+    //     const previousLetters = [];
+
+    //     for (let i = 0; i < y; i++) {
+    //         const row = [];
+    //         for (let j = 0; j < x; j++) {
+    //             const letter = new Letter(null, previousLetters);
+    //             previousLetters.push(letter.value);
+    //             row.push(letter);
+    //         }
+    //         boggle.push(row);
+    //     }
+
+    //     for (let i = 0; i < boggle.length; i++) {
+    //         let prevRow = boggle[i - 1] || [];
+    //         let row = boggle[i];
+    //         let nextRow = boggle[i + 1] || [];
+    //         for (let j = 0; j < row.length; j++) {
+    //             const letter = row[j];
+    //             Object.assign(letter, {
+    //                 coordinates: {
+    //                     y: i,
+    //                     x: j
+    //                 },
+    //                 left: row[j - 1],
+    //                 right: row[j + 1],
+    //                 up: prevRow[j],
+    //                 down: nextRow[j],
+    //                 upLeft: prevRow[j - 1],
+    //                 upRight: prevRow[j + 1],
+    //                 downLeft: nextRow[j - 1],
+    //                 downRight: nextRow[j + 1]
+    //             });
+    //         }
+    //     }
+
+    //     this.board = boggle;
+    //     // this.path = [this.board[0][0]];
+    //     const letter = new Letter();
+    //     letter.value = '';
+    //     this.path = [letter];
+    //     this.dimensions = { x, y };
+    // }
     get currentWord() {
         return this.path.map(letter => letter.value).join('');
     }

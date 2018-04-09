@@ -10,7 +10,13 @@ class App extends Component {
   constructor() {
     super();
 
-    const boggle = new Boggle(defaultDimension);
+    const boggle = new Boggle([
+      ["", "", "", "", ""],
+      ["", "", "", "", ""],
+      ["", "G", "L", "", ""],
+      ["O", "G", "", "E", ""],
+      ["B", "", "", "", ""],
+    ]);
 
     this.state = {
       boggle,
@@ -26,6 +32,7 @@ class App extends Component {
 
   }
   componentDidMount() {
+    this.handleChange('input', { target: { value: "BOGGLE" } });
     function keyDown(e) {
       if (e.key === 'Control' || e.metaKey) this.ctrl = true;
       if (e.key === 'Enter' && this.ctrl) return this.validateWords.call(this);
@@ -220,14 +227,14 @@ class App extends Component {
                 board.map((row, i) => (
                   <tr key={`Row: ${i}`} className="row" >
                     {
-                      row.map(letter => {
+                      row.map((letter, j) => {
                         let index = path.indexOf(letter) + 1;
                         let last = path[path.length - 1] === letter;
                         let used = path.includes(letter) && !last;
                         let available = path[path.length - 1].adjacentLetterObjects.includes(letter) && !used;
                         return (
                           <td
-                            key={`Letter: X: ${letter.coordinates.x}, Y: ${letter.coordinates.y}`}
+                            key={`Letter: X: ${j}, Y: ${i}`}
                             className="cell"
                             onClick={this.handleClick.bind(this, letter.coordinates)}
                           >
@@ -282,10 +289,11 @@ class App extends Component {
             }
             {
               wordsToDisplay.map((word, i) => {
-                let { selected, valid, tested, defined } = word;
+                let { selected, valid, tested, defined, value } = word;
                 console.log(selected, valid, tested, defined);
                 return (
                   <button
+                    key={`WORD: ${value}`}
                     className={`word ${valid ? 'valid' : 'invalid'} ${selected ? 'selected' : ''} ${defined ? 'defined' : 'undefined'} ${tested ? '' : 'untested'}`}
                     onClick={this.updatePath.bind(this, word)}
                   >
