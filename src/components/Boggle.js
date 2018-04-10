@@ -125,7 +125,16 @@ function getRandomLetter(previousLetters = [], dimension = 0) {
     return lettersArr[~~(Math.random() * lettersArr.length)];
 }
 
-const validDirections = ['up', 'down', 'left', 'right', 'upLeft', 'upRight', 'downLeft', 'downRight'];
+const validDirections = [
+    'upLeft',
+    'up',
+    'upRight',
+    'right',
+    'downRight',
+    'down',
+    'downLeft',
+    'left'
+];
 
 class Letter {
     constructor(val, previousLetters = []) {
@@ -213,8 +222,10 @@ class Boggle {
                 let downLeft = nextRow[j - 1];
                 let downRight = nextRow[j + 1];
                 Object.assign(letter, {
-                    y: i,
-                    x: j,
+                    coordinates: {
+                        y: i,
+                        x: j
+                    },
                     left,
                     right,
                     up,

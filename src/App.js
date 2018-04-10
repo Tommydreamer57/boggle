@@ -150,6 +150,7 @@ class App extends Component {
     })
   }
   handleClick(coordinates, e) {
+    console.log(coordinates)
     let { boggle, input } = this.state;
     const { board, path } = boggle;
     const { x, y } = coordinates;
