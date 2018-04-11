@@ -1,4 +1,7 @@
 
+.App {
+}
+
 input {
   background: #DEF;
   outline: none;
@@ -7,10 +10,71 @@ input {
   border-radius: 4px;
 }
 
-.App {
+.Play {
   display: flex;
   justify-content: space-around;
   align-items: flex-start;
+}
+
+.link {
+  position: absolute;
+  top: 0;
+  left: 0;
+  max-width: calc(100vw - 5px);
+  max-height: calc(100vh - 5px);
+  margin: 0;
+  background: none;
+  border: none;
+  box-shadow: none;
+  outline: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: 0.6s;
+}
+
+.link a {
+  color: #DEF;
+  text-decoration: none;
+  z-index: 2;
+}
+
+.start {
+  top: 40vh;
+  height: 10vh;
+  width: 100%;
+  padding: 0 50%;
+  font-size: 36px;
+}
+
+.end {
+  width: 10%;
+  padding: 0;
+  height: 32px;
+  
+}
+
+.link-shadow {
+  position: fixed;
+  background-image: radial-gradient(black, transparent, transparent);
+  transition: 0.6s;
+  z-index: 1;
+}
+
+.start .link-shadow {
+  top: -100vh;
+  bottom: -100vh;
+  left: -100vw;
+  right: -100vw;
+  opacity: 1;
+}
+
+.end .link-shadow {
+  top: 0;
+  left: 0;
+  right: 100vw;
+  bottom: 100vh;
+  opacity: 0;
 }
 
 #blur {
