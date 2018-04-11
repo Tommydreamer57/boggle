@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
-import Boggle from './components/Boggle';
 import axios from 'axios';
+import Boggle from './Boggle';
+import Board from './components/Board/Board';
+import WordList from './components/WordList/WordList';
 
 const defaultDimension = 5
 
@@ -209,107 +211,31 @@ class App extends Component {
 
     return (
       <div className="App" >
-        <div className="left" >
-          <div className="buttons" >
-            <button onClick={this.resetBoard.bind(this, defaultDimension)} >RESET BOARD</button>
-            <input
-              type='number'
-              min={3}
-              max={9}
-              value={this.state.dimension}
-              onChange={this.handleChange.bind(this, 'dimension')}
-              onKeyDown={e => e.key === 'Enter' ? this.resetBoard.call(this, this.state.dimension) : null}
-            />
-            <button onClick={this.resetBoard.bind(this, this.state.dimension)} >UPDATE BOARD</button>
-          </div>
-          <table id="board" >
-            <tbody className="board" >
-              {
-                board.map((row, i) => (
-                  <tr key={`Row: ${i}`} className="row" >
-                    {
-                      row.map((letter, j) => {
-                        let index = path.indexOf(letter) + 1;
-                        let last = path[path.length - 1] === letter;
-                        let used = path.includes(letter) && !last;
-                        let available = path[path.length - 1].adjacentLetterObjects.includes(letter) && !used;
-                        return (
-                          <td
-                            key={`Letter: X: ${j}, Y: ${i}`}
-                            className="cell"
-                            onClick={this.handleClick.bind(this, letter.coordinates)}
-                          >
-                            <div className={`letter ${used ? 'used' : ''} ${available ? 'available' : ''} ${last ? 'last' : ''}`} >
-                              <div className="circle" >
-                                {
-                                  index ?
-                                    <div className="index" >{index}</div>
-                                    :
-                                    null
-                                }
-                                {letter.value}
-                              </div>
-                            </div>
-                          </td>
-                        )
-                      })
-                    }
-                  </tr>
-                ))
-              }
-            </tbody>
-          </table>
-          <div className="buttons" >
-            <button onClick={this.updatePath.bind(this)} >RESET PATH</button>
-            {/* <h3>
-              {
-                path.map(letter => letter.value.toUpperCase())
-              }
-            </h3> */}
-            <button onClick={this.addWord.bind(this, path.map(letter => letter.value).join(''), true)} >ADD WORD</button>
-          </div>
-        </div>
+        <Board
+          resetBoard={this.resetBoard.bind(this, defaultDimension)}
+          dimension={this.state.dimension}
+          handleDimensionChange={this.handleChange.bind(this, 'dimension')}
+          onKeyDown={e => e.key === 'Enter' ? this.resetBoard.call(this, this.state.dimension) : null}
+          updateBoard={this.resetBoard.bind(this, this.state.dimension)}
+          board={board}
+          path={path}
+          handleClick={this.handleClick.bind(this)}
+          updatePath={this.updatePath.bind(this)}
+          addWord={this.addWord.bind(this, path.map(letter => letter.value).join(''), true)}
+        />
         <div id="divider" />
-        <div className="right">
-          <div className="header" >
-            {/* <h3>ADD WORDS HERE</h3> */}
-            <input
-              placeholder="Type a word here..."
-              value={this.state.input.toUpperCase()}
-              onChange={this.handleChange.bind(this, 'input')}
-              onKeyDown={e => e.key === 'Enter' ? this.addWord.call(this, this.state.input) : null}
-            />
-            <button onClick={this.addWord.bind(this, this.state.input)} >ADD WORD</button>
-          </div>
-          <div className={`body ${validating ? 'validating' : ''}`} >
-            {
-              !words.length ?
-                <button className="word" >Your words will show up here...</button>
-                :
-                null
-            }
-            {
-              wordsToDisplay.map((word, i) => {
-                let { selected, valid, tested, defined, value } = word;
-                console.log(selected, valid, tested, defined);
-                return (
-                  <button
-                    key={`WORD: ${value}`}
-                    className={`word ${valid ? 'valid' : 'invalid'} ${selected ? 'selected' : ''} ${defined ? 'defined' : 'undefined'} ${tested ? '' : 'untested'}`}
-                    onClick={this.updatePath.bind(this, word)}
-                  >
-                    {word.value.toUpperCase() + ' (' + word.validations.length + ')'}
-                    {word.validations.indexOf(path) + 1 ? ' - (' + (word.validations.indexOf(path) + 1) + ')' : ''}
-                  </button>
-                )
-              })
-            }
-          </div>
-          <div className="right-buttons" >
-            <button onClick={this.validateWords.bind(this)} >VALIDATE WORDS</button>
-            <button onClick={this.resetValidations.bind(this)} >RESET VALIDATIONS</button>
-          </div>
-        </div>
+        <WordList
+          input={this.state.input.toUpperCase()}
+          handleInputChange={this.handleChange.bind(this, 'input')}
+          onKeyDown={e => e.key === 'Enter' ? this.addWord.call(this, this.state.input) : null}
+          addWord={this.addWord.bind(this, this.state.input)}
+          validating={validating}
+          words={wordsToDisplay}
+          path={path}
+          updatePath={this.updatePath.bind(this)}
+          validateWords={this.validateWords.bind(this)}
+          resetValidations={this.resetValidations.bind(this)}
+        />
       </div>
     );
   }
