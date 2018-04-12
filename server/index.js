@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const socketio = require('socket.io');
 const axios = require('axios');
 const MongoClient = require('mongodb').MongoClient;
 const Cache = require('./cache');
@@ -34,6 +35,7 @@ MongoClient.connect(MONGO_URI, function (err, client) {
         console.log(`ERROR CONNECTING TO MONGODB`);
         console.log(err);
     }
+    console.log(`${MONGO_DBNAME} connected to server`);
     const db = client.db(MONGO_DBNAME);
     app.set('db', db);
     // OXFORD
@@ -52,8 +54,54 @@ MongoClient.connect(MONGO_URI, function (err, client) {
     // CACHE
     const cache = new Cache({ config, db, collection, env });
     app.set('cache', cache);
-    console.log(`${MONGO_DBNAME} connected to server`);
-    app.listen(PORT, () => console.log(`Boggle listening on port ${PORT}`));
+});
+
+// SOCKETS
+
+const listen = app.listen(PORT, () => console.log(`Boggle listening on port ${PORT}`));
+const io = socketio(listen);
+
+let gameId = 1;
+const currentGames = [gameId++, gameId++, gameId++];
+
+io.on('connection', socket => {
+    // console.log('sockets connected');
+    // CREATE GAME
+    socket.on('start game', (data) => {
+        console.log('starting game');
+        console.log(data);
+
+        const game = ++gameId;
+        currentGames.push(game);
+        socket.join(game);
+
+        io.to(game).emit('game started', { gameId })
+    });
+    // FIND GAMES
+    socket.on('find games', (data) => {
+        console.log('finding games');
+        console.log(data);
+
+        const room = 'FIND';
+        socket.join(room);
+
+        io.to(room).emit('games found', { currentGames });
+    });
+    // JOIN GAME
+    socket.on('join game', (data) => {
+        console.log('joining game');
+        console.log(data);
+
+        const room = data.game;
+        socket.join(room);
+
+        io.to(room).emit('game joined', data);
+    });
+//     // END GAME
+//     socket.on('end game', (data) => {
+//         console.log('ending game');
+//         console.log(data);
+//     });
 });
 
 // ENDPOINTS

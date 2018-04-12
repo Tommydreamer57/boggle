@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import Boggle from './boggle-creator';
-import Left from '../Left/Left';
-import Right from '../Right/Right';
+import Left from './Left/Left';
+import Right from './Right/Right';
 
 const defaultDimension = 5;
 
@@ -29,6 +29,9 @@ class App extends Component {
         this.ctrl = false;
     }
     componentDidMount() {
+        if (this.props.match.params.gameid) {
+            
+        }
         this.handleChange('input', { target: { value: "BOGGLE" } });
         function keyDown(e) {
             if (e.key === 'Control' || e.metaKey) this.ctrl = true;

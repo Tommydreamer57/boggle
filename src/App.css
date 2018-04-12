@@ -11,10 +11,15 @@ input {
   border-radius: 4px;
 }
 
-.Play, .Join {
+.Play, .Join, .Start {
   display: flex;
   justify-content: space-around;
   align-items: flex-start;
+}
+
+.Join, .Start {
+  flex-direction: column;
+  align-items: center;
 }
 
 .link {
@@ -34,12 +39,18 @@ input {
   transition: 0.6s;
 }
 
-.link a {
+.link a, .link p {
   color: #DEF;
   text-decoration: none;
   white-space: nowrap;
   z-index: 2;
   margin: 0 24px;
+  transition: color 0.2s;
+}
+
+.link a:hover, .link p:hover {
+  color: #FFF;
+  /* text-decoration: underline; */
 }
 
 .start {
@@ -56,6 +67,32 @@ input {
   padding: 0;
   height: 32px;
   opacity: 0.5;
+}
+
+.Join .end {
+  opacity: 0;
+}
+
+.user {
+  color: #DEF;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 64px;
+}
+
+.user input {
+  border: 3px solid #DEF;
+  background: rgba(255, 255, 255, 0.1);
+  color: #DEF;
+  padding: 8px;
+  font-size: 24px;
+  text-align: center;
+}
+
+.Start .user {
+  margin: 98px;
 }
 
 .link-shadow {
@@ -87,12 +124,6 @@ input {
   right: -8px;
   bottom: -8px;
   left: -8px;
-  /* filter: brightness(0.35) blur(4px); */
-  /* background: rgba(15, 50, 105, 0.75); */
-  /* background-image: url(https://images.unsplash.com/photo-1520858155255-80d7f2569f22?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=6b16a7dddf7228dd3ccc20d563667161&auto=format&fit=crop&w=600&q=60); */
-  /* background-size: cover; */
-  /* background-position: center; */
-  /* background: #101838; */
   background: #101838;  
   z-index: -2;
 }
@@ -103,7 +134,7 @@ input {
   right: -8px;
   bottom: -8px;
   left: -8px;
-  background-image: radial-gradient(transparent, transparent, rgba(0, 0, 0, 0.5));
+  background-image: radial-gradient(transparent, rgba(0, 0, 0, 0.075), rgba(0, 0, 0, 0.5));
   z-index: -1;
 }
 
@@ -359,6 +390,20 @@ button.invalid {
   align-items: center;
   top: 2px;
   left: 2px;
+}
+
+
+
+.games {
+  display: flex;
+  flex-direction: column;
+}
+
+.game {
+  background: #DEF;
+  padding: 16px 24px;
+  border-radius: 8px;
+  margin: 8px;
 }
 
 
