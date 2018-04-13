@@ -2,7 +2,7 @@ const axios = require('axios');
 
 class Cache {
     constructor(config) {
-        this.dbCollection = config.db.collection(config.collection);
+        this.dbCollection = config.dbCollection;
         this.config = config.config;
         this.env = config.env;
         this.words = [

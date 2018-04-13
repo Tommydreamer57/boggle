@@ -4,9 +4,12 @@ import { Switch, Route, Link } from 'react-router-dom';
 import Landing from './components/Landing/Landing';
 import Start from './components/Start/Start';
 import Join from './components/Join/Join';
+import Wait from './components/Wait/Wait';
 import Play from './components/Play/Play';
 // COMPONENTS
 import Modal from './components/Modal/Modal';
+// BOGGLE
+import { boardCreator } from './boggle-creator';
 // SOCKET
 import io from 'socket.io-client';
 // CSS
@@ -17,6 +20,10 @@ export default class App extends Component {
     super();
     this.state = {
       currentGames: [],
+      joinedGame: {
+        dimension: 4,
+        board: []
+      },
       user: {
         name: ''
       }
@@ -39,16 +46,39 @@ export default class App extends Component {
   joinGame(game) {
     this.socket.emit('join game', game);
   }
-  handleJoinedGame(game) {
-    console.log(game);
-    this.history.push(`/play/${game}`);
+  handleJoinedGame(joinedGame) {
+    console.log(joinedGame);
+    this.history.push(`/wait/${joinedGame._id}`);
+    this.setState({
+      joinedGame
+    })
   }
   startGame() {
-    this.socket.emit('start game', this.user);
+    const { dimension } = this.state.joinedGame;
+    const board = boardCreator(dimension);
+    console.log(board);
+    console.log(dimension);
+    this.socket.emit('start game', { board, dimension, user: this.state.user });
+  }
+  enterGame() {
+    const { _id } = this.state.joinedGame;
+    this.history.push(`/play/${_id}`);
   }
   handleUserChange(prop, e) {
     this.setState({
-      user: { [prop]: e.target.value }
+      user: {
+        ...this.state.user,
+        [prop]: e.target.value
+      }
+    })
+  }
+  handleGameChange(prop, e) {
+    if (prop === "dimension" && (e.target.value < 3 || e.target.value > 9)) return;
+    this.setState({
+      joinedGame: {
+        ...this.state.joinedGame,
+        [prop]: e.target.value
+      }
     })
   }
   componentDidMount() {
@@ -63,7 +93,10 @@ export default class App extends Component {
       storeHistory: this.storeHistory.bind(this),
       user: this.state.user,
       handleUserChange: this.handleUserChange.bind(this),
-      startGame: this.startGame.bind(this)
+      joinedGame: this.state.joinedGame,
+      handleGameChange: this.handleGameChange.bind(this),
+      startGame: this.startGame.bind(this),
+      enterGame: this.enterGame.bind(this)
     }
     return (
       <div className="App">
@@ -78,11 +111,7 @@ export default class App extends Component {
               text={["START GAME", "JOIN GAME", "FREE PLAY"]}
               to={["/start", "/join", "/play"]}
             />,
-            <Landing
-              {...props}
-              {...viewProps}
-              key="LANDING"
-            />
+            <Landing {...props} {...viewProps} key="LANDING" />
           ]} />
           {/* START */}
           <Route path="/start" render={(props) => [
@@ -92,11 +121,7 @@ export default class App extends Component {
               text="BACK"
               to="/"
             />,
-            <Start
-              {...props}
-              {...viewProps}
-              key="START"
-            />
+            <Start {...props} {...viewProps} key="START" />
           ]} />
           {/* JOIN */}
           <Route path="/join" render={(props) => [
@@ -106,12 +131,18 @@ export default class App extends Component {
               text="BACK"
               to="/"
             />,
-            <Join
-              {...props}
-              {...viewProps}
-              key="JOIN"
-            />
+            <Join {...props} {...viewProps} key="JOIN" />
           ]} />
+          <Route path="/wait" render={(props) => [
+            <Modal
+              key="LINK"
+              className="link end"
+              text="EXIT"
+              to="/join"
+            />,
+            <Wait {...props} {...viewProps} key="WAIT" />
+          ]}
+          />
           {/* PLAY */}
           <Route path="/play/:gameid" render={(props) => [
             <Modal
@@ -120,11 +151,14 @@ export default class App extends Component {
               text="END GAME"
               to="/"
             />,
-            <Play
-              {...props}
-              {...viewProps}
-              key="PLAY"
+            <Play {...props} {...viewProps} key="PLAY" />,
+            <Modal
+              key="USERNAME"
+              className="link username"
+              text={this.state.user.name}
+              type="display"
             />
+            // <button className="link username"><a href="" >{this.state.user.name || ''}</a></button>
           ]} />
           {/* FREE PLAY */}
           <Route path="/play" render={(props) => [
@@ -134,11 +168,7 @@ export default class App extends Component {
               text="END GAME"
               to="/"
             />,
-            <Play
-              {...props}
-              {...viewProps}
-              key="PLAY"
-            />
+            <Play {...props} {...viewProps} key="PLAY" />
           ]} />
         </Switch>
       </div>

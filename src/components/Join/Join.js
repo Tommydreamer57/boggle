@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import Modal from '../Modal/Modal';
-import User from '../User/User';
 
 export default class Join extends Component {
     constructor() {
@@ -41,9 +40,11 @@ export default class Join extends Component {
                     to={['', '']}
                     clicks={[toggleModal.bind(this, -1), joinGame.bind(null, selectedGame)]}
                 />
-                <User
-                    user={user}
-                    handleUserChange={handleUserChange}
+                <input
+                    type="text"
+                    value={user.name}
+                    placeholder="Please enter your name"
+                    onChange={handleUserChange.bind(null, 'name')}
                 />
                 <div className="games">
                     {

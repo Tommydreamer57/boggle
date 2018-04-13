@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import User from '../User/User';
 
 export default class Start extends Component {
     constructor() {
@@ -10,14 +9,26 @@ export default class Start extends Component {
         this.props.storeHistory(this.props.history);
     }
     render() {
-        const { startGame, user, handleUserChange } = this.props;
+        const { startGame, user, handleUserChange, joinedGame, handleGameChange } = this.props;
         return (
             <div className="Start" >
-                <User
-                    user={user}
-                    handleUserChange={handleUserChange}
-                />
-                <button onClick={startGame} >START</button>
+                <div className="input-wrapper" >
+                    <h4>Your Name</h4>
+                    <input
+                        type="text"
+                        value={user.name}
+                        onChange={handleUserChange.bind(null, 'name')}
+                    />
+                </div>
+                <div className="input-wrapper" >
+                    <h4>Board Size</h4>
+                    <input
+                        type="number"
+                        value={joinedGame.dimension}
+                        onChange={handleGameChange.bind(null, 'dimension')}
+                    />
+                </div>
+                <button className="start-game" onClick={startGame} >START</button>
             </div>
         )
     }

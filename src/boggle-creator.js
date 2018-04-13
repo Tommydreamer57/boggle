@@ -125,6 +125,22 @@ function getRandomLetter(previousLetters = [], dimension = 0) {
     return lettersArr[~~(Math.random() * lettersArr.length)];
 }
 
+export function boardCreator(dimension) {
+    if (!dimension) dimension = 4;
+    const board = [];
+    const previousLetters = [];
+    for (let i = 0; i < dimension; i++) {
+        const row = [];
+        for (let j = 0; j < dimension; j++) {
+            const letter = getRandomLetter(previousLetters);
+            previousLetters.push(letter);
+            row.push(letter);
+        }
+        board.push(row);
+    }
+    return board;
+}
+
 const validDirections = [
     'upLeft',
     'up',

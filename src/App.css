@@ -11,15 +11,19 @@ input {
   border-radius: 4px;
 }
 
-.Play, .Join, .Start {
+.Play, .Join, .Start, .Wait {
   display: flex;
   justify-content: space-around;
   align-items: flex-start;
 }
 
-.Join, .Start {
+.Join, .Start, .Wait {
+  display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: space-around;
+  min-height: 80vh;
+  padding: 10vh;
 }
 
 .link {
@@ -62,6 +66,15 @@ input {
   opacity: 1;
 }
 
+.link.username {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: unset;
+  height: 32px;  
+  opacity: 0.5;
+}
+
 .end {
   width: 10%;
   padding: 0;
@@ -73,16 +86,11 @@ input {
   opacity: 0;
 }
 
-.user {
-  color: #DEF;
+.Start input, .Join input {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin: 64px;
-}
-
-.user input {
   border: 3px solid #DEF;
   background: rgba(255, 255, 255, 0.1);
   color: #DEF;
@@ -91,8 +99,17 @@ input {
   text-align: center;
 }
 
-.Start .user {
-  margin: 98px;
+.input-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.input-wrapper h4 {
+  color: #DEF;
+  font-size: 20px;
+  margin-bottom: 16px;
 }
 
 .link-shadow {
@@ -399,11 +416,16 @@ button.invalid {
   flex-direction: column;
 }
 
-.game {
+.game, .start-game {
   background: #DEF;
   padding: 16px 24px;
   border-radius: 8px;
   margin: 8px;
+}
+
+
+.start-game {
+
 }
 
 

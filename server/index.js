@@ -26,9 +26,6 @@ const PORT = 3013;
 
 // MONGODB CONNECTION
 
-// COLLECTION
-const collection = 'boggle';
-
 // CONNECTION
 MongoClient.connect(MONGO_URI, function (err, client) {
     if (err) {
@@ -36,46 +33,59 @@ MongoClient.connect(MONGO_URI, function (err, client) {
         console.log(err);
     }
     console.log(`${MONGO_DBNAME} connected to server`);
+    // DB
     const db = client.db(MONGO_DBNAME);
-    app.set('db', db);
-    // OXFORD
-    const config = {
-        headers: {
-            APP_ID: OXFORD_APP_ID,
-            APP_KEY: OXFORD_APP_KEY
-        }
-    }
-    // ENV
-    const env = {
-        OXFORD_APP_ID,
-        OXFORD_APP_KEY,
-        OXFORD_URL
-    }
+    // COLLECTIONS
+    const ow = db.collection('oxford-words');
+    const bg = db.collection('boggle-games');
+    bg.drop();
+
     // CACHE
-    const cache = new Cache({ config, db, collection, env });
+    const cache = new Cache({
+        config: {
+            headers: {
+                APP_ID: OXFORD_APP_ID,
+                APP_KEY: OXFORD_APP_KEY
+            }
+        },
+        env: {
+            OXFORD_APP_ID,
+            OXFORD_APP_KEY,
+            OXFORD_URL
+        },
+        dbCollection: ow
+    });
+    // ADD INSTANCES TO APP
+    app.set('db', db);
+    app.set('ow', ow);
+    app.set('bg', bg);
     app.set('cache', cache);
 });
 
 // SOCKETS
 
-const listen = app.listen(PORT, () => console.log(`Boggle listening on port ${PORT}`));
-const io = socketio(listen);
-
-let gameId = 1;
-const currentGames = [gameId++, gameId++, gameId++];
+const io = socketio(app.listen(PORT, () => console.log(`Boggle listening on port ${PORT}`)));
 
 io.on('connection', socket => {
     // console.log('sockets connected');
     // CREATE GAME
-    socket.on('start game', (data) => {
+    socket.on('start game', (game) => {
         console.log('starting game');
-        console.log(data);
+        console.log(game);
 
-        const game = ++gameId;
-        currentGames.push(game);
-        socket.join(game);
+        if (!game.players) game.players = [game.user];
+        
+        const bg = app.get('bg');
+        bg.insert(game).then(result => {
+            console.log(result);
+            let game = result.ops[0];
+            let id = game._id;
+            
+            socket.join(id);
+            io.to(id).emit('game started', game);
+            
+        });
 
-        io.to(game).emit('game started', { gameId })
     });
     // FIND GAMES
     socket.on('find games', (data) => {
@@ -85,7 +95,7 @@ io.on('connection', socket => {
         const room = 'FIND';
         socket.join(room);
 
-        io.to(room).emit('games found', { currentGames });
+        io.to(room).emit('games found', { currentGames: [] });
     });
     // JOIN GAME
     socket.on('join game', (data) => {
@@ -97,19 +107,19 @@ io.on('connection', socket => {
 
         io.to(room).emit('game joined', data);
     });
-//     // END GAME
-//     socket.on('end game', (data) => {
-//         console.log('ending game');
-//         console.log(data);
-//     });
+    //     // END GAME
+    //     socket.on('end game', (data) => {
+    //         console.log('ending game');
+    //         console.log(data);
+    //     });
 });
 
 // ENDPOINTS
 
 // GET ALL WORDS
 app.get('/api/words', (req, res) => {
-    const db = app.get('db');
-    db.collection(collection).find().toArray().then(words => {
+    const ow = app.get('ow');
+    ow.find().toArray().then(words => {
         res.status(200).send(words);
     }).catch(err => {
         res.status(500).send(err);
@@ -127,8 +137,8 @@ app.get('/api/words/:word', (req, res) => {
 });
 // GET DUPLICATES
 app.get('/api/duplicates', (req, res) => {
-    const db = app.get('db');
-    db.collection(collection).find().toArray().then(words => {
+    const ow = app.get('ow');
+    ow.find().toArray().then(words => {
         let results = words.filter(word => {
             if (words.filter(item => item === word).length <= 1) return false;
             else return true;
@@ -138,6 +148,7 @@ app.get('/api/duplicates', (req, res) => {
 });
 // GET CACHE
 app.get('/api/cache', (req, res) => {
+    const cache = app.get('cache');
     res.status(200).send(cache.words);
 });
 // VALIDATE WORDS

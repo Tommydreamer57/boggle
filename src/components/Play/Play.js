@@ -1,24 +1,17 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import Boggle from './boggle-creator';
+import Boggle from '../../boggle-creator';
 import Left from './Left/Left';
 import Right from './Right/Right';
 
 const defaultDimension = 5;
 
-class App extends Component {
+export default class Play extends Component {
     constructor() {
         super();
-        const boggle = new Boggle([
-            ["", "", "", "", ""],
-            ["", "", "", "", ""],
-            ["", "G", "L", "", ""],
-            ["O", "G", "", "E", ""],
-            ["B", "", "", "", ""],
-        ]);
         this.state = {
-            boggle,
+            boggle: new Boggle(defaultDimension),
             dimension: defaultDimension,
             input: '',
             words: [],
@@ -29,9 +22,19 @@ class App extends Component {
         this.ctrl = false;
     }
     componentDidMount() {
-        if (this.props.match.params.gameid) {
-            
-        }
+        let { joinedGame } = this.props;
+        let { board } = joinedGame
+        if (!board.length) board = [
+            ["", "", "", "", ""],
+            ["", "", "", "", ""],
+            ["", "G", "L", "", ""],
+            ["O", "G", "", "E", ""],
+            ["B", "", "", "", ""],
+        ];
+        const boggle = new Boggle(board);
+        this.setState({ boggle });
+        console.log(boggle);
+
         this.handleChange('input', { target: { value: "BOGGLE" } });
         function keyDown(e) {
             if (e.key === 'Control' || e.metaKey) this.ctrl = true;
@@ -253,5 +256,3 @@ class App extends Component {
         );
     }
 }
-
-export default App;
