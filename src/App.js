@@ -44,9 +44,10 @@ export default class App extends Component {
     });
   }
   joinGame(game) {
-    this.socket.emit('join game', game);
+    const { user } = this.state;
+    this.socket.emit('join game', { game, user });
   }
-  handleJoinedGame(joinedGame) {
+  handleJoinedGame({ joinedGame }) {
     console.log(joinedGame);
     this.history.push(`/wait/${joinedGame._id}`);
     this.setState({

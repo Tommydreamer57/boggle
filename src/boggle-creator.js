@@ -1,4 +1,4 @@
-function getRandomLetter(previousLetters = [], dimension = 0) {
+export function getRandomLetter(previousLetters = [], dimension = 0) {
     // SCRABBLE
     const scrabble = {
         A: 13,
@@ -125,13 +125,24 @@ function getRandomLetter(previousLetters = [], dimension = 0) {
     return lettersArr[~~(Math.random() * lettersArr.length)];
 }
 
-export function boardCreator(dimension) {
-    if (!dimension) dimension = 4;
+export function boardCreator() {
+    let x, y;
+    if (typeof arguments[0] === 'object') {
+        x = arguments[0].x;
+        y = arguments[0].y;
+    } else {
+        x = arguments[0];
+        y = arguments[1] || x;
+    }
+    if (!x && !y) {
+        x = y = 4;
+    }
+    if (x <= 0 || y <= 0) throw new Error('dimensions must be positive');
     const board = [];
     const previousLetters = [];
-    for (let i = 0; i < dimension; i++) {
+    for (let i = 0; i < y; i++) {
         const row = [];
-        for (let j = 0; j < dimension; j++) {
+        for (let j = 0; j < x; j++) {
             const letter = getRandomLetter(previousLetters);
             previousLetters.push(letter);
             row.push(letter);
@@ -141,7 +152,7 @@ export function boardCreator(dimension) {
     return board;
 }
 
-const validDirections = [
+export const validDirections = [
     'upLeft',
     'up',
     'upRight',
@@ -152,9 +163,10 @@ const validDirections = [
     'left'
 ];
 
-class Letter {
+export class Letter {
     constructor(val, previousLetters = []) {
         if (!val) val = getRandomLetter(previousLetters.map(letter => letter.value));
+        val = val.toUpperCase();
         this.value = val;
         this.coordinates = {};
     }
@@ -178,12 +190,22 @@ class Letter {
     }
 }
 
+// const board = [
+//     ['K', 'X', 'O', 'Z', 'V', 'F'],
+//     ['B', 'A', 'M', 'L', 'H', 'R'],
+//     ['V', 'U', 'Q', 'J', 'M', 'S'],
+//     ['V', 'A', 'J', 'A', 'M', 'K'],
+//     ['V', 'I', 'T', 'T', 'D', 'O'],
+//     ['U', 'P', 'K', 'B', 'A', 'B'],
+// ];
+
 class Boggle {
     constructor() {
         let board, x, y;
-
         if (Array.isArray(arguments[0])) {
             board = arguments[0];
+            if (!board.every(row => Array.isArray(row))) throw new Error('board must be a two dimensional array');
+            if (!board.every((row, i) => row.length === (board[i + 1] || board[0]).length)) throw new Error('all rows must be of equal length');
             y = board.length;
             x = board[0].length;
         } else if (typeof arguments[0] === 'object') {
@@ -196,10 +218,9 @@ class Boggle {
             y = arguments[1] || x;
         }
         if (!x && !y) {
-            // throw new Error('Boggle requires dimensions, please specify x or y');
-            // DEFAULT DIMENSIONS
-            x = y = 5;
+            x = y = 4;
         }
+        if (x <= 0 || y <= 0) throw new Error('dimensions must be positive');
 
         // IF WE ARE GIVEN A BOARD
         let previousLetters = [];
@@ -258,69 +279,11 @@ class Boggle {
         this.path = [new Letter(' ')];
         this.dimensions = { x, y };
     }
-    // constructor(x, y) {
-    //     if (typeof x === 'object') var { x, y } = x;
-    //     if (!x && !y) throw new Error('Boggle requires dimensions, please specify x or y');
-    //     if (!y) y = x;
-    //     if (!x) x = y;
-
-    //     const boggle = [];
-
-    //     // const board = [
-    //     // 	['K', 'X', 'O', 'Z', 'V', 'F'],
-    //     // 	['B', 'A', 'M', 'L', 'H', 'R'],
-    //     // 	['V', 'U', 'Q', 'J', 'M', 'S'],
-    //     // 	['V', 'A', 'J', 'A', 'M', 'K'],
-    //     // 	['V', 'I', 'T', 'T', 'D', 'O'],
-    //     // 	['U', 'P', 'K', 'B', 'A', 'B'],
-    //     // ];
-
-    //     const previousLetters = [];
-
-    //     for (let i = 0; i < y; i++) {
-    //         const row = [];
-    //         for (let j = 0; j < x; j++) {
-    //             const letter = new Letter(null, previousLetters);
-    //             previousLetters.push(letter.value);
-    //             row.push(letter);
-    //         }
-    //         boggle.push(row);
-    //     }
-
-    //     for (let i = 0; i < boggle.length; i++) {
-    //         let prevRow = boggle[i - 1] || [];
-    //         let row = boggle[i];
-    //         let nextRow = boggle[i + 1] || [];
-    //         for (let j = 0; j < row.length; j++) {
-    //             const letter = row[j];
-    //             Object.assign(letter, {
-    //                 coordinates: {
-    //                     y: i,
-    //                     x: j
-    //                 },
-    //                 left: row[j - 1],
-    //                 right: row[j + 1],
-    //                 up: prevRow[j],
-    //                 down: nextRow[j],
-    //                 upLeft: prevRow[j - 1],
-    //                 upRight: prevRow[j + 1],
-    //                 downLeft: nextRow[j - 1],
-    //                 downRight: nextRow[j + 1]
-    //             });
-    //         }
-    //     }
-
-    //     this.board = boggle;
-    //     // this.path = [this.board[0][0]];
-    //     const letter = new Letter();
-    //     letter.value = '';
-    //     this.path = [letter];
-    //     this.dimensions = { x, y };
-    // }
     get currentWord() {
         return this.path.map(letter => letter.value).join('');
     }
     validate(word) {
+        if (!word) return [];
         word = word.toUpperCase().split('').reduce((arr, val) => {
             if (arr[arr.length - 1] === "Q" && val === "U") arr[arr.length - 1] += val;
             else arr.push(val);
@@ -387,56 +350,50 @@ class Boggle {
             y = x.y;
             x = x.x;
         };
-        if (x > this.x) throw new Error('invalid coordinate x: ' + x);
-        if (y > this.y) throw new Error('invalid coordinate y: ' + y);
+        if (x >= this.dimensions.x || x < 0) throw new Error('invalid coordinate x: ' + x);
+        if (y >= this.dimensions.y || y < 0) throw new Error('invalid coordinate y: ' + y);
+        if ((!x && x !== 0) || (!y && y !== 0)) throw new Error('must specify coordinates x & y');
         console.log(arguments);
         console.log(x, y);
         console.log(this);
         this.path = [this.board[y][x]];
         return this;
     }
-    move(direction) {
+    move(...directions) {
+        if (!this.board.some(row => row.includes(this.path[0]))) throw new Error('must start before moving');
+        if (directions.length === 1 && Array.isArray(directions[0])) directions = directions[0];
+        directions.forEach(direction => {
+            let nextLetter;
+            if (typeof direction === 'object') {
+                
+                let { x, y } = direction;
 
-        if (typeof direction === 'object') {
-
-            const { x, y } = direction;
-
-            const nextLetter = this.board[y][x];
-
-            if (this.path[0] === nextLetter) {
-                this.resetPath();
-                return this;
+                nextLetter = this.board[y][x];
+                
+                if (this.path[0] === nextLetter) return this.resetPath();
+                if (this.path.includes(nextLetter)) {
+                    this.path = this.path.slice(0, this.path.indexOf(nextLetter));
+                    return this;
+                }
+                if (!this.path[this.path.length - 1].adjacentLetterObjects.some(letter => letter.coordinates.x === x && letter.coordinates.y === y)) throw new Error('invalid destination: ' + x + ' ' + y);
+                
+            } else {
+                
+                if (!validDirections.includes(direction)) throw new Error('must specify legitimate direction');
+                
+                nextLetter = this.path[this.path.length - 1][direction];
+                
+                if (!nextLetter) throw new Error('invalid direction from current position');
+                if (this.path.includes(nextLetter)) throw new Error('letter already used: ' + nextLetter.value);
+                
             }
-
-            if (this.path.includes(nextLetter)) {
-                this.path = this.path.slice(0, this.path.indexOf(nextLetter));
-                return this;
-            }
-
-            if (!this.path[this.path.length - 1].adjacentLetterObjects.some(letter => letter.coordinates.x === x && letter.coordinates.y === y)) throw new Error('invalid destination');
-
-
-            this.path.push(nextLetter);
-
-            return this;
-        } else {
-
-            if (!validDirections.includes(direction)) throw new Error('must specify legitimate direction');
-
-            const nextLetter = this.path[this.path.length - 1][direction];
-
-            if (!nextLetter) throw new Error('invalid direction from current position');
-            if (this.path.includes(nextLetter)) throw new Error('letter already used: ' + nextLetter.value);
-
-            this.path.push(nextLetter);
-
-            return this;
-        }
+            nextLetter && this.path.push(nextLetter);
+        });
+        return this;
     }
     resetPath() {
-        const letter = new Letter();
-        letter.value = '';
-        this.path = [letter];
+        this.path = [new Letter(' ')];
+        return this;
     }
 }
 

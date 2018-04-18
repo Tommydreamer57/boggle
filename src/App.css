@@ -49,11 +49,12 @@ input {
   white-space: nowrap;
   z-index: 2;
   margin: 0 24px;
-  transition: color 0.2s;
+  transition: text-shadow 0.2s;
 }
 
 .link a:hover, .link p:hover {
-  color: #FFF;
+  text-shadow: 1px 5px 30px rgba(189, 222, 255, 1.75);
+  /* color: #FFF; */
   /* text-decoration: underline; */
 }
 
@@ -423,9 +424,19 @@ button.invalid {
   margin: 8px;
 }
 
+.game:hover, .start-game:hover {
+  cursor: pointer;
+}
+
 
 .start-game {
+  margin-bottom: 48px;
+}
 
+.Join h4 {
+  margin-bottom: 20vh;
+  font-size: 20px;
+  color: #DEF;
 }
 
 

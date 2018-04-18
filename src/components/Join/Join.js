@@ -36,7 +36,7 @@ export default class Join extends Component {
                     type="select"
                     style={{ zIndex: modal ? 1 : -1 }}
                     className={`link ${modal ? 'start' : 'end'}`}
-                    text={["CANCEL", `JOIN GAME ${selectedGame}`]}
+                    text={["CANCEL", `JOIN GAME ${selectedGame._id}`]}
                     to={['', '']}
                     clicks={[toggleModal.bind(this, -1), joinGame.bind(null, selectedGame)]}
                 />
@@ -48,11 +48,14 @@ export default class Join extends Component {
                 />
                 <div className="games">
                     {
-                        currentGames.map(game => (
-                            <div key={`GAME ${game}`} className="game" onClick={toggleModal.bind(this, game)} >
-                                GAME {game}
-                            </div>
-                        ))
+                        currentGames.length ?
+                            currentGames.map(game => (
+                                <button key={`GAME ${game._id}`} className="game" onClick={toggleModal.bind(this, game)} >
+                                    GAME: {game.user.name}
+                                </button>
+                            ))
+                            :
+                            <h4>There are no current games</h4>
                     }
                 </div>
             </div>
