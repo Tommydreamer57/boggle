@@ -235,10 +235,26 @@ describe('boggle use tests', () => {
       expect(boggle.path[0]).toBe(boggle.board[0][0]);
       expect(boggle.path[1]).toBe(boggle.board[1][0]);
       expect(boggle.path[2]).toBe(boggle.board[1][1]);
-      expect(boggle.path[3]).toBe(boggle.board[2][2]);      
+      expect(boggle.path[3]).toBe(boggle.board[2][2]);
     });
-    test('can', () => {
-      
+    test('can move to specific coordinates', () => {
+      expect(boggle.start(0, 0).move({ x: 1, y: 1 }, { x: 2, y: 2 })).toBe(boggle);
+      expect(boggle.path).toHaveLength(3);
+      expect(boggle.path[0]).toBe(boggle.board[0][0]);
+      expect(boggle.path[1]).toBe(boggle.board[1][1]);
+      expect(boggle.path[2]).toBe(boggle.board[2][2]);
+    });
+    test('move to path[0] resets path', () => {
+      expect(boggle.start(0, 0).move('down', 'down', 'down', { x: 0, y: 0 })).toBe(boggle);
+      expect(boggle.path).toHaveLength(1);
+      boggle.board.forEach(row => {
+        expect(row).not.toEqual(expect.arrayContaining(boggle.path));
+      });
+    });
+    test('move to path[>0] chops off path at that point', () => {
+      expect(boggle.start(0, 0).move('down', 'right', 'down', { x: 0, y: 1 })).toBe(boggle);
+      expect(boggle.path).toHaveLength(1);
+      expect(boggle.path[0]).toBe(boggle.board[0][0]);
     });
     test('can reset path', () => {
       boggle.start(0, 0).move('down').move('right');
@@ -257,17 +273,30 @@ describe('boggle use tests', () => {
     test('reset returns boggle object', () => {
       expect(boggle.start(0, 0).move('downRight').resetPath()).toBe(boggle);
     });
+    test('can get current word from path', () => {
+      let boggle = new Boggle([
+        ['a', 'b', 'c'],
+        ['d', 'e', 'f'],
+        ['g', 'h', 'i']
+      ]);
+      expect(boggle.start(0, 0).move('down', 'down', 'right').currentWord).toEqual('ADGH');
+      expect(boggle.start(2, 0).move('down', 'down', 'left').currentWord).toEqual('CFIH');
+      expect(boggle.start(1, 1).move({ x: 2, y: 0 }, 'left', { x: 0, y: 0 }).currentWord).toEqual('ECBA');
+    });
   });
   describe('invalid path creation tests', () => {
     const boggle = new Boggle(5);
     test('invalid starting point - negative value', () => {
       expect(() => boggle.start(0, -1)).toThrow(/invalid/);
     });
-    test('invalid starting point - greater than board length', () => {
+    test('invalid starting point - not on board', () => {
       expect(() => boggle.start(0, 5)).toThrow(/invalid/);
     });
     test('invalid starting point - object', () => {
       expect(() => boggle.start({ x: -1, y: 4 })).toThrow(/invalid/);
+    });
+    test('cannot move before starting path', () => {
+      expect(() => boggle.resetPath().move()).toThrow(/before/);
     });
     test('invalid direction - misspelled', () => {
       expect(() => boggle.start(0, 0).move('downnn')).toThrow(/direction/);
@@ -281,5 +310,18 @@ describe('boggle use tests', () => {
       expect(() => boggle.start(0, 0).move('right').move('left')).toThrow(/already/);
       expect(() => boggle.start(0, 0).move('down').move('up')).toThrow(/already/);
     });
+    test('invalid destination - missing coordinate', () => {
+      expect(() => boggle.start(0, 0).move('down', { x: 0 })).toThrow(/both/);
+      expect(() => boggle.start(2, 1).move('down', { y: 1 })).toThrow(/both/);
+    });
+    test('invalid destination - negative', () => {
+      expect(() => boggle.start(0, 0).move('down', 'down', 'down', { x: -1, y: 0 })).toThrow(/invalid/);
+    });
+    test('invalid destination - not on board', () => {
+      expect(() => boggle.start(0, 0).move({ x: 0, y: 5 })).toThrow(/invalid/);
+    });
+    test('invalid destination - not adjacent to path end', () => {
+      expect(() => boggle.start(0, 0).move('down', 'down', { x: 2, y: 0 })).toThrow(/invalid/);
+    })
   });
 });

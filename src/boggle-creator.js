@@ -290,7 +290,7 @@ class Boggle {
             return arr;
         }, []);
 
-        console.log(word);
+        // console.log(word);
 
         function walkPath(currentLetter, validPaths, currentPath = []) {
 
@@ -353,9 +353,6 @@ class Boggle {
         if (x >= this.dimensions.x || x < 0) throw new Error('invalid coordinate x: ' + x);
         if (y >= this.dimensions.y || y < 0) throw new Error('invalid coordinate y: ' + y);
         if ((!x && x !== 0) || (!y && y !== 0)) throw new Error('must specify coordinates x & y');
-        console.log(arguments);
-        console.log(x, y);
-        console.log(this);
         this.path = [this.board[y][x]];
         return this;
     }
@@ -365,27 +362,30 @@ class Boggle {
         directions.forEach(direction => {
             let nextLetter;
             if (typeof direction === 'object') {
-                
+
                 let { x, y } = direction;
 
+                if ((!x && x !== 0) || (!y && y !== 0)) throw new Error('must provide both x and y coordinates');
+                if (x >= this.dimensions.x || y >= this.dimensions.y) throw new Error('invalid destination not on board: ' + x + ' ' + y);
+
                 nextLetter = this.board[y][x];
-                
+
                 if (this.path[0] === nextLetter) return this.resetPath();
                 if (this.path.includes(nextLetter)) {
                     this.path = this.path.slice(0, this.path.indexOf(nextLetter));
                     return this;
                 }
                 if (!this.path[this.path.length - 1].adjacentLetterObjects.some(letter => letter.coordinates.x === x && letter.coordinates.y === y)) throw new Error('invalid destination: ' + x + ' ' + y);
-                
+
             } else {
-                
+
                 if (!validDirections.includes(direction)) throw new Error('must specify legitimate direction');
-                
+
                 nextLetter = this.path[this.path.length - 1][direction];
-                
+
                 if (!nextLetter) throw new Error('invalid direction from current position');
                 if (this.path.includes(nextLetter)) throw new Error('letter already used: ' + nextLetter.value);
-                
+
             }
             nextLetter && this.path.push(nextLetter);
         });
