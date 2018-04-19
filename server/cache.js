@@ -2,11 +2,13 @@ const axios = require('axios');
 const dump = require('./dump/words.json');
 
 class Cache {
-    constructor(config) {
+    constructor({ dbCollection, config, env }) {
         // DATABASE
-        this.dbCollection = config.dbCollection;
+        this.dbCollection = dbCollection;
+        // CONFIG
+        this.config = config;
         // ENV
-        this.env = config.env;
+        this.env = env;
         // WORDS
         this.words = dump;
         // REQUEST ID
@@ -96,9 +98,7 @@ class Cache {
             if (cachedWord) return cachedWord;
             // CHECK CACHE FOR CURRENT REQUESTS
             return this.findRequest(wordString).then(word => {
-                if (word) {
-                    return word;
-                }
+                if (word) return word;
                 // CHECK DB FOR WORD
                 const request = this.findInDb(wordString).then(word => {
                     if (word) return word;

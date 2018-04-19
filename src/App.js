@@ -55,11 +55,17 @@ export default class App extends Component {
     })
   }
   startGame() {
-    const { dimension } = this.state.joinedGame;
+    const { joinedGame, user } = this.state
+    const { dimension } = joinedGame;
     const board = boardCreator(dimension);
-    console.log(board);
-    console.log(dimension);
-    this.socket.emit('start game', { board, dimension, user: this.state.user });
+    const players = [user];
+    const game = {
+      board,
+      dimension,
+      user,
+      players
+    }
+    this.socket.emit('start game', { game, user });
   }
   enterGame() {
     const { _id } = this.state.joinedGame;

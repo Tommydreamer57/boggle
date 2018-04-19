@@ -36,16 +36,16 @@ export default class Play extends Component {
         console.log(boggle);
 
         this.handleChange('input', { target: { value: "BOGGLE" } });
-        function keyDown(e) {
+        let keyDown = (e) => {
             if (e.key === 'Control' || e.metaKey) this.ctrl = true;
             if (e.key === 'Enter' && this.ctrl) return this.validateWords.call(this);
             if (e.key === 'Enter') this.addWord.call(this, this.state.input);
         }
-        function keyUp(e) {
+        let keyUp = (e) => {
             if (e.key === 'Control' || e.metaKey) this.ctrl = false;
         }
-        window.addEventListener('keydown', keyDown.bind(this));
-        window.addEventListener('keyup', keyUp.bind(this));
+        window.addEventListener('keydown', keyDown);
+        window.addEventListener('keyup', keyUp);
         axios.get('/api/words').then(response => {
             const cache = response.data;
             this.setState({ cache });
@@ -115,12 +115,17 @@ export default class Play extends Component {
 
         this.setState({ validating: true });
 
-        axios.post('/api/validate', { words }).then(response => {
+        let request = new Promise(resolve => setTimeout(resolve.bind(null, { data: [] }), 0));
+
+        if (words.length) request = axios.post('/api/validate', { words });
+
+        request.then(response => {
             console.log(response.data);
             cache = [...cache, ...response.data];
             oxfordValidations = cache;
             setTimeout(() => this.setState({ cache, oxfordValidations, validating: false }), 500);
         }).catch(err => {
+            console.log(err);
             setTimeout(() => this.setState({ validating: false }), 500);
         });
     }
