@@ -12,7 +12,7 @@ export default class Join extends Component {
     }
     affirm() {
         console.log(`selecting ${this.state.selectedGame}`);
-        this.props.joinGame.call(null, this.state.selectedGame);
+        this.props.joinGame.call(null, this.state.selectedGame._id);
     }
     toggleModal(selectedGame) {
         console.log(`toggling modal, ${this.state.selectedGame}`);
@@ -22,7 +22,9 @@ export default class Join extends Component {
         });
     }
     componentDidMount() {
-        this.props.storeHistory(this.props.history);
+        const { mapHistoryToApp, match, history } = this.props;
+        const { params } = history;
+        mapHistoryToApp({ history, params });
         this.props.socket.emit('find games');
     }
     render() {
@@ -38,7 +40,7 @@ export default class Join extends Component {
                     className={`link ${modal ? 'start' : 'end'}`}
                     text={["CANCEL", `JOIN GAME ${selectedGame._id}`]}
                     to={['', '']}
-                    clicks={[toggleModal.bind(this, -1), joinGame.bind(null, selectedGame)]}
+                    clicks={[toggleModal.bind(this, -1), joinGame.bind(null, selectedGame._id)]}
                 />
                 <input
                     type="text"
@@ -51,7 +53,7 @@ export default class Join extends Component {
                         currentGames.length ?
                             currentGames.map(game => (
                                 <button key={`GAME ${game._id}`} className="game" onClick={toggleModal.bind(this, game)} >
-                                    GAME: {game.user.name}
+                                    GAME: {game.user.name} - BOARD: {game.dimension} x {game.dimension} - PLAYERS: {game.players.length}
                                 </button>
                             ))
                             :

@@ -70,8 +70,8 @@ MongoClient.connect(MONGO_URI, function (err, client) {
 
     io.on('connection', socket => {
         // CREATE GAME
-        socket.on('start game', ({ game }) => {
-            console.log('starting game');
+        socket.on('create game', ({ game }) => {
+            console.log('creating game');
 
             if (!game.players || !game.players.length) game.players = [game.user];
 
@@ -86,7 +86,7 @@ MongoClient.connect(MONGO_URI, function (err, client) {
                 let id = game._id;
 
                 socket.join(id);
-                io.to(id).emit('game started', { joinedGame: game });
+                io.to(id).emit('game created', { joinedGame: game });
 
             });
 
@@ -107,38 +107,41 @@ MongoClient.connect(MONGO_URI, function (err, client) {
 
         });
         // JOIN GAME
-        socket.on('join game', ({ game, user }) => {
+        socket.on('join game', ({ gameid, user }) => {
             console.log('joining game');
-            console.log(game);
+            console.log(gameid);
             console.log(user);
 
-            const { _id } = game;
-            socket.join(_id);
+            socket.join(gameid);
 
             const bg = app.get('bg');
-            bg.find(ObjectId(_id)).toArray().then(({ 0: joinedGame }) => {
+            bg.find(ObjectId(gameid)).toArray().then(({ 0: joinedGame }) => {
 
                 console.log(joinedGame);
 
                 let players = joinedGame.players || [];
 
-                if (players.some(player => player.name === user.name)) return io.to('FIND').emit('already joined', { joinedGame });
+                if (players.some(player => player.name === user.name)) return io.to(gameid).emit('already joined', { joinedGame });
 
                 players.push(user);
 
-                bg.findAndModify({ _id: ObjectId(_id) }, [], { $set: { players } }, { new: true }).then(results => {
-                    console.log('SUCCESSFULLY UPDATED ' + _id);
+                bg.findAndModify({ _id: ObjectId(gameid) }, [], { $set: { players } }, { new: true }).then(results => {
+                    console.log('SUCCESSFULLY UPDATED ' + gameid);
                     console.log(results.value);
 
                     let joinedGame = results.value;
 
-                    socket.join(_id);
-                    io.to(_id).emit('game joined', { joinedGame });
+                    socket.join(gameid);
+                    io.to(gameid).emit('game joined', { joinedGame });
 
                 }).catch(err => {
                     console.log(err);
                 });
 
+            });
+            // START GAME
+            socket.on('start game', ({ gameid }) => {
+                
             });
 
         });

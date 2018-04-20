@@ -8,10 +8,41 @@ import Right from './Right/Right';
 const defaultDimension = 5;
 
 export default class Play extends Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
+
+        let { joinedGame, match, joinGame, mapHistoryToApp, history } = this.props;
+        let { board, dimension } = joinedGame;
+        let { params } = match;
+        let { gameid } = params;
+
+        mapHistoryToApp({ history, params });
+
+
+
+        if (!board.length) {
+            if (gameid) {
+                board = [];
+                for (let i = 0; i < dimension; i++) {
+                    const row = [];
+                    for (let j = 0; j < dimension; j++) {
+                        row.push(' ');
+                    }
+                    board.push(row);
+                }
+                joinGame(gameid)
+            }
+            else board = [
+                ["", "", "", "", ""],
+                ["", "", "", "", ""],
+                ["", "G", "L", "", ""],
+                ["O", "G", "", "E", ""],
+                ["B", "", "", "", ""],
+            ];
+        }
+
         this.state = {
-            boggle: new Boggle(defaultDimension),
+            boggle: new Boggle(board),
             dimension: defaultDimension,
             input: '',
             words: [],
@@ -22,18 +53,25 @@ export default class Play extends Component {
         this.ctrl = false;
     }
     componentDidMount() {
-        let { joinedGame } = this.props;
-        let { board } = joinedGame
-        if (!board.length) board = [
-            ["", "", "", "", ""],
-            ["", "", "", "", ""],
-            ["", "G", "L", "", ""],
-            ["O", "G", "", "E", ""],
-            ["B", "", "", "", ""],
-        ];
-        const boggle = new Boggle(board);
-        this.setState({ boggle });
-        console.log(boggle);
+        let { joinedGame, match, joinGame } = this.props;
+        let { board } = joinedGame;
+        let { params } = match;
+        let { gameid } = params;
+        if (!board.length) {
+            if (gameid) joinGame(gameid);
+            else {
+                board = [
+                    ["", "", "", "", ""],
+                    ["", "", "", "", ""],
+                    ["", "G", "L", "", ""],
+                    ["O", "G", "", "E", ""],
+                    ["B", "", "", "", ""],
+                ];
+                const boggle = new Boggle(board);
+                this.setState({ boggle });
+                console.log(boggle);
+            }
+        }
 
         this.handleChange('input', { target: { value: "BOGGLE" } });
         let keyDown = (e) => {
@@ -50,6 +88,13 @@ export default class Play extends Component {
             const cache = response.data;
             this.setState({ cache });
         });
+    }
+    componentWillReceiveProps({ joinedGame }) {
+        if (joinedGame.board.length) {
+            const boggle = new Boggle(joinedGame.board);
+            this.setState({ boggle });
+            console.log(boggle);
+        }
     }
     resetBoard(dimension = defaultDimension) {
         console.log(arguments);
@@ -182,6 +227,7 @@ export default class Play extends Component {
         const { boggle, words, oxfordValidations, validating } = this.state;
         const { board, path, dimensions } = boggle;
         const { x: size } = dimensions;
+        const { gameid } = this.props.match.params;
         console.log(this.state);
 
         const mappedWords = words.map((word, i) => {
@@ -229,7 +275,8 @@ export default class Play extends Component {
         const leftData = {
             dimension: this.state.dimension,
             board,
-            path
+            path,
+            gameid
         }
         const rightMethods = {
             handleInputChange: this.handleChange.bind(this, 'input'),
@@ -243,7 +290,8 @@ export default class Play extends Component {
             input: this.state.input.toUpperCase(),
             validating,
             words: wordsToDisplay,
-            path
+            path,
+            gameid
         }
 
         return (

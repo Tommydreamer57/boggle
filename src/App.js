@@ -31,11 +31,13 @@ export default class App extends Component {
     const socket = io('/');
     socket.on('games found', this.receiveGames.bind(this));
     socket.on('game joined', this.handleJoinedGame.bind(this));
-    socket.on('game started', this.handleJoinedGame.bind(this));
+    socket.on('already joined', this.handleAlreadyJoined.bind(this));
+    socket.on('game created', this.handleJoinedGame.bind(this));
     this.socket = socket;
   }
-  storeHistory(history) {
+  mapHistoryToApp({history, params}) {
     this.history = history;
+    this.params = params;
   }
   receiveGames({ currentGames }) {
     console.log(currentGames);
@@ -43,18 +45,25 @@ export default class App extends Component {
       currentGames
     });
   }
-  joinGame(game) {
+  joinGame(gameid) {
     const { user } = this.state;
-    this.socket.emit('join game', { game, user });
+    this.socket.emit('join game', { gameid, user });
   }
   handleJoinedGame({ joinedGame }) {
     console.log(joinedGame);
     this.history.push(`/wait/${joinedGame._id}`);
     this.setState({
       joinedGame
-    })
+    });
   }
-  startGame() {
+  handleAlreadyJoined({ joinedGame }) {
+    console.log(joinedGame);
+    this.history.push(`/play/${joinedGame._id}`);
+    this.setState({
+      joinedGame
+    });
+  }
+  createGame() {
     const { joinedGame, user } = this.state
     const { dimension } = joinedGame;
     const board = boardCreator(dimension);
@@ -65,7 +74,7 @@ export default class App extends Component {
       user,
       players
     }
-    this.socket.emit('start game', { game, user });
+    this.socket.emit('create game', { game, user });
   }
   enterGame() {
     const { _id } = this.state.joinedGame;
@@ -90,6 +99,7 @@ export default class App extends Component {
   }
   componentDidMount() {
     this.socket.emit('find games');
+    // if (this.params.gameid) this.socket.emit('join game', {})
   }
   render() {
     console.log(this.state);
@@ -97,12 +107,12 @@ export default class App extends Component {
       currentGames: this.state.currentGames,
       socket: this.socket,
       joinGame: this.joinGame.bind(this),
-      storeHistory: this.storeHistory.bind(this),
+      mapHistoryToApp: this.mapHistoryToApp.bind(this),
       user: this.state.user,
       handleUserChange: this.handleUserChange.bind(this),
       joinedGame: this.state.joinedGame,
       handleGameChange: this.handleGameChange.bind(this),
-      startGame: this.startGame.bind(this),
+      createGame: this.createGame.bind(this),
       enterGame: this.enterGame.bind(this)
     }
     return (
@@ -140,7 +150,8 @@ export default class App extends Component {
             />,
             <Join {...props} {...viewProps} key="JOIN" />
           ]} />
-          <Route path="/wait" render={(props) => [
+          {/* WAIT */}
+          <Route path="/wait/:gameid" render={(props) => [
             <Modal
               key="LINK"
               className="link end"

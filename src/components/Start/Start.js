@@ -6,10 +6,12 @@ export default class Start extends Component {
         super();
     }
     componentDidMount() {
-        this.props.storeHistory(this.props.history);
+        const { history, match } = this.props;
+        const { params } = match;
+        this.props.mapHistoryToApp({ history, params });
     }
     render() {
-        const { startGame, user, handleUserChange, joinedGame, handleGameChange } = this.props;
+        const { createGame, user, handleUserChange, joinedGame, handleGameChange } = this.props;
         return (
             <div className="Start" >
                 <div className="input-wrapper" >
@@ -28,7 +30,7 @@ export default class Start extends Component {
                         onChange={handleGameChange.bind(null, 'dimension')}
                     />
                 </div>
-                <button className="start-game" onClick={startGame} >START</button>
+                <button className="start-game" onClick={createGame} >Start</button>
             </div>
         )
     }
