@@ -10614,5 +10614,864 @@
             "region": "gb",
             "matchString": "share"
         }
+    },
+    {
+        "_id": "5ad8c619d51cf50f9460d3cc",
+        "value": "AIR",
+        "defined": true,
+        "entry": {
+            "id": "air",
+            "matchType": "inflection",
+            "inflection_id": "air",
+            "region": "gb",
+            "word": "air",
+            "score": 12.682389,
+            "matchString": "air"
+        }
+    },
+    {
+        "_id": "5ad8c65230a6d83644a6567b",
+        "value": "AERIALS",
+        "defined": true,
+        "entry": {
+            "matchString": "aerials",
+            "inflection_id": "aerials",
+            "score": 8.016775,
+            "region": "gb",
+            "matchType": "inflection",
+            "word": "aerial",
+            "id": "aerial"
+        }
+    },
+    {
+        "_id": "5ad8c65230a6d83644a6567c",
+        "value": "AERIAL",
+        "defined": true,
+        "entry": {
+            "id": "aerial",
+            "matchType": "inflection",
+            "inflection_id": "aerial",
+            "region": "gb",
+            "word": "aerial",
+            "score": 12.682389,
+            "matchString": "aerial"
+        }
+    },
+    {
+        "_id": "5ad8e19273105416c46d5d92",
+        "value": "AICRW",
+        "defined": false,
+        "entry": {}
+    },
+    {
+        "_id": "5ad8e19273105416c46d5d93",
+        "value": "WON",
+        "defined": true,
+        "entry": {
+            "word": "won",
+            "matchType": "inflection",
+            "inflection_id": "won",
+            "score": 12.682389,
+            "id": "won",
+            "region": "gb",
+            "matchString": "won"
+        }
+    },
+    {
+        "_id": "5ad8e19273105416c46d5d94",
+        "value": "AT",
+        "defined": true,
+        "entry": {
+            "region": "gb",
+            "word": "at",
+            "matchType": "inflection",
+            "inflection_id": "at",
+            "matchString": "at",
+            "id": "at",
+            "score": 12.682389
+        }
+    },
+    {
+        "_id": "5ad8ed0654c3fa0f78c9dbd1",
+        "value": "GENE",
+        "defined": true,
+        "entry": {
+            "matchString": "gene",
+            "inflection_id": "gene",
+            "score": 12.682389,
+            "region": "gb",
+            "matchType": "inflection",
+            "word": "gene",
+            "id": "gene"
+        }
+    },
+    {
+        "_id": "5ad9f39c37544e1fe8913231",
+        "value": "GOGLE",
+        "defined": false,
+        "entry": {
+            "region": "gb",
+            "word": "google",
+            "matchType": "fuzzy",
+            "matchString": "gogle",
+            "score": 5.741692,
+            "id": "google"
+        }
+    },
+    {
+        "_id": "5ad9f3a037544e1fe8913232",
+        "value": "GOGGLE",
+        "defined": true,
+        "entry": {
+            "id": "goggle",
+            "matchType": "inflection",
+            "inflection_id": "goggle",
+            "region": "gb",
+            "word": "goggle",
+            "score": 12.682389,
+            "matchString": "goggle"
+        }
+    },
+    {
+        "_id": "5ad9f4d3b2d35a2bd4fd6790",
+        "value": "TOR",
+        "defined": true,
+        "entry": {
+            "id": "tor",
+            "matchType": "inflection",
+            "inflection_id": "tor",
+            "region": "gb",
+            "word": "tor",
+            "score": 12.682389,
+            "matchString": "tor"
+        }
+    },
+    {
+        "_id": "5ad9f6c9e11eb908108b6790",
+        "value": "FEN",
+        "defined": true,
+        "entry": {
+            "id": "fen",
+            "matchType": "inflection",
+            "inflection_id": "fen",
+            "region": "gb",
+            "word": "fen",
+            "score": 12.682389,
+            "matchString": "fen"
+        }
+    },
+    {
+        "_id": "5ad9f6cae11eb908108b6791",
+        "value": "CAY",
+        "defined": true,
+        "entry": {
+            "region": "gb",
+            "word": "cay",
+            "matchType": "inflection",
+            "inflection_id": "cay",
+            "matchString": "cay",
+            "id": "cay",
+            "score": 12.682389
+        }
+    },
+    {
+        "_id": "5ad9f6cae11eb908108b6794",
+        "value": "GAF",
+        "defined": false,
+        "entry": {
+            "id": "waf",
+            "region": "gb",
+            "matchType": "fuzzy",
+            "word": "WAF",
+            "score": 2.185077,
+            "matchString": "gaf"
+        }
+    },
+    {
+        "_id": "5ad9f6cae11eb908108b6793",
+        "value": "GAT",
+        "defined": true,
+        "entry": {
+            "word": "gat",
+            "matchType": "inflection",
+            "inflection_id": "gat",
+            "score": 12.682389,
+            "id": "gat",
+            "region": "gb",
+            "matchString": "gat"
+        }
+    },
+    {
+        "_id": "5ad9f6cae11eb908108b6792",
+        "value": "TAG",
+        "defined": true,
+        "entry": {
+            "matchString": "tag",
+            "inflection_id": "tag",
+            "score": 12.682389,
+            "region": "gb",
+            "matchType": "inflection",
+            "word": "tag",
+            "id": "tag"
+        }
+    },
+    {
+        "_id": "5ada0046053e283360c92199",
+        "value": "BAG",
+        "defined": true,
+        "entry": {
+            "word": "bag",
+            "matchType": "inflection",
+            "inflection_id": "bag",
+            "score": 12.682389,
+            "id": "bag",
+            "region": "gb",
+            "matchString": "bag"
+        }
+    },
+    {
+        "_id": "5ada0046053e283360c9219a",
+        "value": "TOP",
+        "defined": true,
+        "entry": {
+            "region": "gb",
+            "word": "top",
+            "matchType": "inflection",
+            "inflection_id": "top",
+            "matchString": "top",
+            "id": "top",
+            "score": 12.682389
+        }
+    },
+    {
+        "_id": "5ada091c053e283360c9219c",
+        "value": "QUAG",
+        "defined": true,
+        "entry": {
+            "region": "gb",
+            "word": "quag",
+            "matchType": "inflection",
+            "inflection_id": "quag",
+            "matchString": "quag",
+            "id": "quag",
+            "score": 12.682389
+        }
+    },
+    {
+        "_id": "5ada091c053e283360c9219d",
+        "value": "APMERE",
+        "defined": false,
+        "entry": {
+            "id": "ampere",
+            "region": "gb",
+            "matchType": "fuzzy",
+            "word": "ampere",
+            "score": 4.3363724,
+            "matchString": "apmere"
+        }
+    },
+    {
+        "_id": "5ada091c053e283360c9219f",
+        "value": "MAP",
+        "defined": true,
+        "entry": {
+            "matchString": "map",
+            "inflection_id": "map",
+            "score": 12.682389,
+            "region": "gb",
+            "matchType": "inflection",
+            "word": "map",
+            "id": "map"
+        }
+    },
+    {
+        "_id": "5ada091c053e283360c9219e",
+        "value": "APM",
+        "defined": false,
+        "entry": {
+            "region": "gb",
+            "word": "wpm",
+            "matchType": "fuzzy",
+            "matchString": "apm",
+            "score": 2.0658674,
+            "id": "wpm"
+        }
+    },
+    {
+        "_id": "5ada091c053e283360c921a0",
+        "value": "PAM",
+        "defined": true,
+        "entry": {
+            "id": "pam.",
+            "region": "us",
+            "matchType": "headword",
+            "word": "pam.",
+            "score": 2.2714198,
+            "matchString": "pam"
+        }
+    },
+    {
+        "_id": "5ada0926053e283360c921a1",
+        "value": "AMPERE",
+        "defined": true,
+        "entry": {
+            "region": "gb",
+            "word": "ampere",
+            "matchType": "inflection",
+            "inflection_id": "ampere",
+            "matchString": "ampere",
+            "id": "ampere",
+            "score": 12.682389
+        }
+    },
+    {
+        "_id": "5ada092d053e283360c921a2",
+        "value": "AMP",
+        "defined": true,
+        "entry": {
+            "region": "gb",
+            "word": "amp",
+            "matchType": "inflection",
+            "inflection_id": "amp",
+            "matchString": "amp",
+            "id": "amp",
+            "score": 12.682389
+        }
+    },
+    {
+        "_id": "5ada0bfc4d80281514a78bd4",
+        "value": "RATS",
+        "defined": true,
+        "entry": {
+            "region": "gb",
+            "word": "rat",
+            "matchType": "inflection",
+            "inflection_id": "rats",
+            "matchString": "rats",
+            "id": "rat",
+            "score": 8.016775
+        }
+    },
+    {
+        "_id": "5ada0bfc4d80281514a78bd5",
+        "value": "SOAR",
+        "defined": true,
+        "entry": {
+            "matchString": "soar",
+            "inflection_id": "soar",
+            "score": 12.682389,
+            "region": "gb",
+            "matchType": "inflection",
+            "word": "soar",
+            "id": "soar"
+        }
+    },
+    {
+        "_id": "5ada0bfd4d80281514a78bd6",
+        "value": "OUT",
+        "defined": true,
+        "entry": {
+            "word": "out",
+            "matchType": "inflection",
+            "inflection_id": "out",
+            "score": 12.682389,
+            "id": "out",
+            "region": "gb",
+            "matchString": "out"
+        }
+    },
+    {
+        "_id": "5ada12a67f5b1a27fc6e5985",
+        "value": "ROE",
+        "defined": true,
+        "entry": {
+            "matchString": "roe",
+            "inflection_id": "roe",
+            "score": 12.682389,
+            "region": "gb",
+            "matchType": "inflection",
+            "word": "roe",
+            "id": "roe"
+        }
+    },
+    {
+        "_id": "5ada12a77f5b1a27fc6e5986",
+        "value": "IRE",
+        "defined": true,
+        "entry": {
+            "region": "gb",
+            "word": "ire",
+            "matchType": "inflection",
+            "inflection_id": "ire",
+            "matchString": "ire",
+            "id": "ire",
+            "score": 12.682389
+        }
+    },
+    {
+        "_id": "5ada12ad7f5b1a27fc6e5987",
+        "value": "RINSE",
+        "defined": true,
+        "entry": {
+            "matchString": "rinse",
+            "inflection_id": "rinse",
+            "score": 12.682389,
+            "region": "gb",
+            "matchType": "inflection",
+            "word": "rinse",
+            "id": "rinse"
+        }
+    },
+    {
+        "_id": "5ada13689153361908666869",
+        "value": "STUPER",
+        "defined": false,
+        "entry": {
+            "score": 2.1865153,
+            "matchString": "stuper",
+            "region": "gb",
+            "matchType": "fuzzy",
+            "word": "stupor",
+            "id": "stupor"
+        }
+    },
+    {
+        "_id": "5ada1368915336190866686a",
+        "value": "SUPERS",
+        "defined": true,
+        "entry": {
+            "word": "super",
+            "matchType": "inflection",
+            "inflection_id": "supers",
+            "score": 8.016775,
+            "id": "super",
+            "region": "gb",
+            "matchString": "supers"
+        }
+    },
+    {
+        "_id": "5ada1368915336190866686c",
+        "value": "KNOT",
+        "defined": true,
+        "entry": {
+            "region": "gb",
+            "word": "knot",
+            "matchType": "inflection",
+            "inflection_id": "knot",
+            "matchString": "knot",
+            "id": "knot",
+            "score": 12.682389
+        }
+    },
+    {
+        "_id": "5ada1368915336190866686b",
+        "value": "BOGUS",
+        "defined": true,
+        "entry": {
+            "matchString": "bogus",
+            "inflection_id": "bogus",
+            "score": 12.682389,
+            "region": "gb",
+            "matchType": "inflection",
+            "word": "bogus",
+            "id": "bogus"
+        }
+    },
+    {
+        "_id": "5ada1368915336190866686d",
+        "value": "KNOTS",
+        "defined": true,
+        "entry": {
+            "id": "knot",
+            "matchType": "inflection",
+            "inflection_id": "knots",
+            "region": "gb",
+            "word": "knot",
+            "score": 8.016775,
+            "matchString": "knots"
+        }
+    },
+    {
+        "_id": "5ada142403a4a624bc63c4be",
+        "value": "BOGGLED",
+        "defined": true,
+        "entry": {
+            "id": "boggle",
+            "matchType": "inflection",
+            "inflection_id": "boggled",
+            "region": "gb",
+            "word": "boggle",
+            "score": 8.016775,
+            "matchString": "boggled"
+        }
+    },
+    {
+        "_id": "5ada142403a4a624bc63c4bf",
+        "value": "BOGGED",
+        "defined": true,
+        "entry": {
+            "matchString": "bogged",
+            "inflection_id": "bogged",
+            "score": 8.016775,
+            "region": "gb",
+            "matchType": "inflection",
+            "word": "bog",
+            "id": "bog"
+        }
+    },
+    {
+        "_id": "5ada242ca07b452374b04e14",
+        "value": "QUILL",
+        "defined": true,
+        "entry": {
+            "region": "gb",
+            "word": "quill",
+            "matchType": "inflection",
+            "inflection_id": "quill",
+            "matchString": "quill",
+            "id": "quill",
+            "score": 12.682389
+        }
+    },
+    {
+        "_id": "5ada2445a07b452374b04e15",
+        "value": "QUEEN",
+        "defined": true,
+        "entry": {
+            "region": "gb",
+            "word": "queen",
+            "matchType": "inflection",
+            "inflection_id": "queen",
+            "matchString": "queen",
+            "id": "queen",
+            "score": 12.682389
+        }
+    },
+    {
+        "_id": "5ada25adfac1c114509bc2e6",
+        "value": "SHAT",
+        "defined": true,
+        "entry": {
+            "word": "shat",
+            "matchType": "inflection",
+            "inflection_id": "shat",
+            "score": 12.682389,
+            "id": "shat",
+            "region": "gb",
+            "matchString": "shat"
+        }
+    },
+    {
+        "_id": "5ada27858003ab36846928e3",
+        "value": "METHS",
+        "defined": true,
+        "entry": {
+            "word": "meths",
+            "matchType": "headword",
+            "score": 12.682389,
+            "id": "meths",
+            "region": "gb",
+            "matchString": "meths"
+        }
+    },
+    {
+        "_id": "5ada27858003ab36846928e2",
+        "value": "METH",
+        "defined": true,
+        "entry": {
+            "matchString": "meth",
+            "inflection_id": "meth",
+            "score": 12.682389,
+            "region": "gb",
+            "matchType": "inflection",
+            "word": "meth",
+            "id": "meth"
+        }
+    },
+    {
+        "_id": "5ada27858003ab36846928e4",
+        "value": "MET",
+        "defined": true,
+        "entry": {
+            "matchString": "met",
+            "inflection_id": "met",
+            "score": 12.682389,
+            "region": "gb",
+            "matchType": "inflection",
+            "word": "met",
+            "id": "met"
+        }
+    },
+    {
+        "_id": "5ada27858003ab36846928e5",
+        "value": "STIRS",
+        "defined": true,
+        "entry": {
+            "id": "stir",
+            "matchType": "inflection",
+            "inflection_id": "stirs",
+            "region": "gb",
+            "word": "stir",
+            "score": 8.016775,
+            "matchString": "stirs"
+        }
+    },
+    {
+        "_id": "5ada27858003ab36846928e6",
+        "value": "HER",
+        "defined": true,
+        "entry": {
+            "region": "gb",
+            "word": "her",
+            "matchType": "inflection",
+            "inflection_id": "her",
+            "matchString": "her",
+            "id": "her",
+            "score": 12.682389
+        }
+    },
+    {
+        "_id": "5ada27858003ab36846928e7",
+        "value": "STIR",
+        "defined": true,
+        "entry": {
+            "word": "stir",
+            "matchType": "inflection",
+            "inflection_id": "stir",
+            "score": 12.682389,
+            "id": "stir",
+            "region": "gb",
+            "matchString": "stir"
+        }
+    },
+    {
+        "_id": "5ada27868003ab36846928e8",
+        "value": "SIRS",
+        "defined": true,
+        "entry": {
+            "matchString": "sirs",
+            "inflection_id": "sirs",
+            "score": 8.016775,
+            "region": "gb",
+            "matchType": "inflection",
+            "word": "sir",
+            "id": "sir"
+        }
+    },
+    {
+        "_id": "5ada283397087935e058f56e",
+        "value": "RIT",
+        "defined": true,
+        "entry": {
+            "region": "gb",
+            "word": "rit.",
+            "matchType": "headword",
+            "matchString": "rit",
+            "score": 2.2714198,
+            "id": "rit."
+        }
+    },
+    {
+        "_id": "5ada283497087935e058f56f",
+        "value": "TIR",
+        "defined": false,
+        "entry": {
+            "score": 1.1357099,
+            "matchString": "tir",
+            "region": "gb",
+            "matchType": "headword",
+            "word": "Tir-na-nog",
+            "id": "tir-na-nog"
+        }
+    },
+    {
+        "_id": "5ada283497087935e058f570",
+        "value": "RIM",
+        "defined": true,
+        "entry": {
+            "id": "rim",
+            "matchType": "inflection",
+            "inflection_id": "rim",
+            "region": "gb",
+            "word": "rim",
+            "score": 12.682389,
+            "matchString": "rim"
+        }
+    },
+    {
+        "_id": "5ada284597087935e058f571",
+        "value": "PETS",
+        "defined": true,
+        "entry": {
+            "word": "pet",
+            "matchType": "inflection",
+            "inflection_id": "pets",
+            "score": 8.016775,
+            "id": "pet",
+            "region": "gb",
+            "matchString": "pets"
+        }
+    },
+    {
+        "_id": "5ada284597087935e058f572",
+        "value": "STEP",
+        "defined": true,
+        "entry": {
+            "id": "step",
+            "matchType": "inflection",
+            "inflection_id": "step",
+            "region": "gb",
+            "word": "step",
+            "score": 12.682389,
+            "matchString": "step"
+        }
+    },
+    {
+        "_id": "5ada287597087935e058f573",
+        "value": "BORG",
+        "defined": false,
+        "entry": {
+            "region": "gb",
+            "word": "Borg, Björn",
+            "matchType": "headword",
+            "matchString": "borg",
+            "score": 1.4196373,
+            "id": "borg%2C_bjorn"
+        }
+    },
+    {
+        "_id": "5ada287597087935e058f574",
+        "value": "BORGLE",
+        "defined": false,
+        "entry": {
+            "score": 2.3191912,
+            "matchString": "borgle",
+            "region": "gb",
+            "matchType": "fuzzy",
+            "word": "burgle",
+            "id": "burgle"
+        }
+    },
+    {
+        "_id": "5ada287597087935e058f575",
+        "value": "BORGLES",
+        "defined": false,
+        "entry": {
+            "id": "burgle",
+            "region": "gb",
+            "matchType": "fuzzy",
+            "word": "burgle",
+            "score": 7.5656786,
+            "matchString": "borgles"
+        }
+    },
+    {
+        "_id": "5ada2add39f49235c80444c0",
+        "value": "RYGGLE",
+        "defined": false,
+        "entry": {
+            "score": 2.6034758,
+            "matchString": "ryggle",
+            "region": "gb",
+            "matchType": "fuzzy",
+            "word": "riggle",
+            "id": "riggle"
+        }
+    },
+    {
+        "_id": "5ada2ade39f49235c80444c1",
+        "value": "MIR",
+        "defined": true,
+        "entry": {
+            "region": "gb",
+            "word": "mir",
+            "matchType": "inflection",
+            "inflection_id": "mir",
+            "matchString": "mir",
+            "id": "mir",
+            "score": 12.682389
+        }
+    },
+    {
+        "_id": "5ada2bc639f49235c80444c3",
+        "value": "EINS",
+        "defined": false,
+        "entry": {
+            "score": 6.5144,
+            "matchString": "eins",
+            "region": "gb",
+            "matchType": "fuzzy",
+            "word": "eina",
+            "id": "eina"
+        }
+    },
+    {
+        "_id": "5ada2bc639f49235c80444c2",
+        "value": "TILES",
+        "defined": true,
+        "entry": {
+            "id": "tile",
+            "matchType": "inflection",
+            "inflection_id": "tiles",
+            "region": "gb",
+            "word": "tile",
+            "score": 8.016775,
+            "matchString": "tiles"
+        }
+    },
+    {
+        "_id": "5ada2bc739f49235c80444c4",
+        "value": "TILE",
+        "defined": true,
+        "entry": {
+            "region": "gb",
+            "word": "tile",
+            "matchType": "inflection",
+            "inflection_id": "tile",
+            "matchString": "tile",
+            "id": "tile",
+            "score": 12.682389
+        }
+    },
+    {
+        "_id": "5ada2bd239f49235c80444c5",
+        "value": "SINSE",
+        "defined": false,
+        "entry": {
+            "region": "gb",
+            "word": "rinse",
+            "matchType": "fuzzy",
+            "matchString": "sinse",
+            "score": 5.741692,
+            "id": "rinse"
+        }
+    },
+    {
+        "_id": "5ada2bd239f49235c80444c6",
+        "value": "SINS",
+        "defined": true,
+        "entry": {
+            "matchString": "sins",
+            "inflection_id": "sins",
+            "score": 8.016775,
+            "region": "gb",
+            "matchType": "inflection",
+            "word": "sin",
+            "id": "sin"
+        }
+    },
+    {
+        "_id": "5ada2be039f49235c80444c7",
+        "value": "ISLE",
+        "defined": true,
+        "entry": {
+            "id": "isle",
+            "matchType": "inflection",
+            "inflection_id": "isle",
+            "region": "gb",
+            "word": "isle",
+            "score": 12.682389,
+            "matchString": "isle"
+        }
     }
 ]

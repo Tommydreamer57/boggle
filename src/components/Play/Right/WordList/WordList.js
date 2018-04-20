@@ -12,15 +12,14 @@ export default function WordList({ path, words, validating, updatePath }) {
             {
                 words.map((word, i) => {
                     let { selected, valid, tested, defined, value } = word;
-                    console.log(selected, valid, tested, defined);
+                    // console.log(selected, valid, tested, defined);
                     return (
                         <button
                             key={`WORD: ${value}`}
                             className={`word ${valid ? 'valid' : 'invalid'} ${selected ? 'selected' : ''} ${defined ? 'defined' : 'undefined'} ${tested ? '' : 'untested'}`}
                             onClick={updatePath.bind(null, word)}
                         >
-                            {word.value.toUpperCase() + ' (' + word.validations.length + ')'}
-                            {word.validations.indexOf(path) + 1 ? ' - (' + (word.validations.indexOf(path) + 1) + ')' : ''}
+                            {`${word.value.toUpperCase()} (${word.validations.length})${word.validations.indexOf(path) + 1 ? ` - (${(word.validations.indexOf(path) + 1)})` : ''}`}
                         </button>
                     )
                 })

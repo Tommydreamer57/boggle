@@ -3,8 +3,11 @@ import { Link } from 'react-router-dom';
 import Modal from '../Modal/Modal';
 
 export default class Join extends Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
+        const { mapHistoryToApp, match, history } = props;
+        const { params } = history;
+        mapHistoryToApp({ history, params });
         this.state = {
             modal: false,
             selectedGame: -1
@@ -22,9 +25,6 @@ export default class Join extends Component {
         });
     }
     componentDidMount() {
-        const { mapHistoryToApp, match, history } = this.props;
-        const { params } = history;
-        mapHistoryToApp({ history, params });
         this.props.socket.emit('find games');
     }
     render() {

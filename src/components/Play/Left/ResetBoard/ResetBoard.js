@@ -1,9 +1,38 @@
-import React from 'react';
+import React, { Component } from 'react';
 
-export default function ResetBoard({ dimension, resetBoard, handleDimensionChange, onKeyDown, updateBoard, gameid }) {
+class Counter extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            startTime: new Date(props.startTime),
+            timeElapsed: new Date(Date.now() - props.startTime)
+        }
+    }
+    componentDidMount() {
+        this.interval = setInterval(this.updateTime.bind(this), 1000);
+    }
+    componentWillUnmount() {
+        clearInterval(this.interval);
+    }
+    updateTime() {
+        this.setState({
+            timeElapsed: new Date(Date.now() - this.state.startTime.valueOf())
+        });
+    }
+    render() {
+        return (
+            <button>
+                {this.state.timeElapsed.toLocaleString()}
+            </button>
+        )
+    }
+}
+
+export default function ResetBoard({ dimension, resetBoard, handleDimensionChange, onKeyDown, updateBoard, gameid, startTime }) {
     if (gameid) return (
         <div className="buttons">
             <button>{}</button>
+            <Counter startTime={startTime} />
         </div>
     )
     else return (

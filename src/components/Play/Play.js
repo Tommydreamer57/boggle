@@ -11,17 +11,15 @@ export default class Play extends Component {
     constructor(props) {
         super(props);
 
-        let { joinedGame, match, joinGame, mapHistoryToApp, history } = this.props;
+        let { joinedGame, match, joinGame, mapHistoryToApp, history, clearJoinedGame } = props;
         let { board, dimension } = joinedGame;
         let { params } = match;
         let { gameid } = params;
 
         mapHistoryToApp({ history, params });
 
-
-
-        if (!board.length) {
-            if (gameid) {
+        if (gameid) {
+            if (!board.length) {
                 board = [];
                 for (let i = 0; i < dimension; i++) {
                     const row = [];
@@ -30,9 +28,12 @@ export default class Play extends Component {
                     }
                     board.push(row);
                 }
-                joinGame(gameid)
+                joinGame(gameid);
             }
-            else board = [
+        }
+        else {
+            clearJoinedGame();
+            board = [
                 ["", "", "", "", ""],
                 ["", "", "", "", ""],
                 ["", "G", "L", "", ""],
@@ -50,29 +51,28 @@ export default class Play extends Component {
             cache: [],
             validating: false
         }
+
         this.ctrl = false;
+
+        this.leftMethods = {
+            resetBoard: this.resetBoard.bind(this, defaultDimension),
+            handleDimensionChange: this.handleChange.bind(this, 'dimension'),
+            onKeyDown: (e) => { e.key === 'Enter' ? this.resetBoard.call(this, this.state.dimension) : null },
+            updateBoard: this.resetBoard.bind(this, this.state.dimension),
+            handleClick: this.handleClick.bind(this),
+            updatePath: this.updatePath.bind(this),
+            addWord: this.addWord.bind(this, this.state.boggle.currentWord, true)
+        }
+        this.rightMethods = {
+            handleInputChange: this.handleChange.bind(this, 'input'),
+            onKeyDown: (e) => { e.key === 'Enter' ? this.addWord.call(this, this.state.input) : null },
+            addWord: this.addWord.bind(this, this.state.input),
+            updatePath: this.updatePath.bind(this),
+            validateWords: this.validateWords.bind(this),
+            resetValidations: this.resetValidations.bind(this)
+        }
     }
     componentDidMount() {
-        let { joinedGame, match, joinGame } = this.props;
-        let { board } = joinedGame;
-        let { params } = match;
-        let { gameid } = params;
-        if (!board.length) {
-            if (gameid) joinGame(gameid);
-            else {
-                board = [
-                    ["", "", "", "", ""],
-                    ["", "", "", "", ""],
-                    ["", "G", "L", "", ""],
-                    ["O", "G", "", "E", ""],
-                    ["B", "", "", "", ""],
-                ];
-                const boggle = new Boggle(board);
-                this.setState({ boggle });
-                console.log(boggle);
-            }
-        }
-
         this.handleChange('input', { target: { value: "BOGGLE" } });
         let keyDown = (e) => {
             if (e.key === 'Control' || e.metaKey) this.ctrl = true;
@@ -93,11 +93,19 @@ export default class Play extends Component {
         if (joinedGame.board.length) {
             const boggle = new Boggle(joinedGame.board);
             this.setState({ boggle });
-            console.log(boggle);
+            // console.log(boggle);
         }
     }
+    componentWillUnmount() {
+        const { socket, user, match } = this.props;
+        const { params } = match;
+        const { gameid } = params;
+        const words = this.state.words.map(word => word.value);
+        console.log(user, words);
+        socket.emit('save words', { gameid, user, words });
+    }
     resetBoard(dimension = defaultDimension) {
-        console.log(arguments);
+        // console.log(arguments);
         const boggle = new Boggle(dimension);
         const input = '';
         const words = [];
@@ -109,7 +117,7 @@ export default class Play extends Component {
         });
     }
     handleChange(prop, e) {
-        console.log(prop, e.target.value);
+        // console.log(prop, e.target.value);
         let value = e.target.value;
         if (prop === 'input') value = value.toUpperCase().trim();
         this.setState({
@@ -121,7 +129,7 @@ export default class Play extends Component {
                 value,
                 validations
             };
-            console.log(word);
+            // console.log(word);
             this.updatePath(word);
         }
     }
@@ -152,7 +160,7 @@ export default class Play extends Component {
         // PREVENT FREQUENT REQUESTS
         if (validating) return;
 
-        words = words.filter(word => {
+        const filteredWords = words.filter(word => {
             let valid = word.validations.length;
             let tested = cache.some(validation => validation.value.toUpperCase() === word.value.toUpperCase());
             return valid && !tested;
@@ -160,14 +168,17 @@ export default class Play extends Component {
 
         this.setState({ validating: true });
 
-        let request = new Promise(resolve => setTimeout(resolve.bind(null, { data: [] }), 0));
+        
+        let request;
 
-        if (words.length) request = axios.post('/api/validate', { words });
+        if (filteredWords.length) request = axios.post('/api/validate', { words: filteredWords });
+        
+        else request = new Promise(resolve => setTimeout(resolve.bind(null, { data: [] }), 0));
 
         request.then(response => {
             console.log(response.data);
             cache = [...cache, ...response.data];
-            oxfordValidations = cache;
+            oxfordValidations = cache.filter(cachedWord => words.some(word => word.value.toUpperCase() === cachedWord.value.toUpperCase()));
             setTimeout(() => this.setState({ cache, oxfordValidations, validating: false }), 500);
         }).catch(err => {
             console.log(err);
@@ -180,7 +191,7 @@ export default class Play extends Component {
         })
     }
     updatePath(word) {
-        console.log(word);
+        // console.log(word);
         const { boggle } = this.state;
         const { path } = boggle;
         let input = word && word.value ? word.value.toUpperCase() : '';
@@ -198,7 +209,7 @@ export default class Play extends Component {
             boggle.path = word.validations[index + 1] || word.validations[0];
             input = boggle.path.map(letter => letter.value.toUpperCase()).join('');
         }
-        console.log(input);
+        // console.log(input);
         this.setState({
             boggle,
             input
@@ -224,11 +235,14 @@ export default class Play extends Component {
         });
     }
     render() {
-        const { boggle, words, oxfordValidations, validating } = this.state;
+        const { leftMethods, rightMethods } = this;
+        const { boggle, words, oxfordValidations, validating, dimension } = this.state;
         const { board, path, dimensions } = boggle;
         const { x: size } = dimensions;
-        const { gameid } = this.props.match.params;
-        console.log(this.state);
+        const { joinedGame, match } = this.props;
+        const { startTime } = joinedGame;
+        const { gameid } = match.params;
+        // console.log(this.state);
 
         const mappedWords = words.map((word, i) => {
             let selected = word.validations.includes(path);
@@ -263,28 +277,13 @@ export default class Play extends Component {
 
         const wordsToDisplay = [...untestedWords, ...definedWords, ...undefinedWords, ...invalidWords];
 
-        const leftMethods = {
-            resetBoard: this.resetBoard.bind(this, defaultDimension),
-            handleDimensionChange: this.handleChange.bind(this, 'dimension'),
-            onKeyDown: (e) => { e.key === 'Enter' ? this.resetBoard.call(this, this.state.dimension) : null },
-            updateBoard: this.resetBoard.bind(this, this.state.dimension),
-            handleClick: this.handleClick.bind(this),
-            updatePath: this.updatePath.bind(this),
-            addWord: this.addWord.bind(this, path.map(letter => letter.value).join(''), true)
-        }
+
         const leftData = {
-            dimension: this.state.dimension,
+            dimension,
             board,
             path,
-            gameid
-        }
-        const rightMethods = {
-            handleInputChange: this.handleChange.bind(this, 'input'),
-            onKeyDown: (e) => { e.key === 'Enter' ? this.addWord.call(this, this.state.input) : null },
-            addWord: this.addWord.bind(this, this.state.input),
-            updatePath: this.updatePath.bind(this),
-            validateWords: this.validateWords.bind(this),
-            resetValidations: this.resetValidations.bind(this)
+            gameid,
+            startTime
         }
         const rightData = {
             input: this.state.input.toUpperCase(),

@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 export default function Modal({ style, className, text, to, type, clicks }) {
-    console.log({ style, className, text, to, type, clicks });
+    // console.log({ style, className, text, to, type, clicks });
     if (!Array.isArray(text)) text = [text];
     if (!Array.isArray(to)) to = [to];
     if (!Array.isArray(clicks)) clicks = [];

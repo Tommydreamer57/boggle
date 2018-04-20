@@ -1,5 +1,5 @@
 const axios = require('axios');
-const dump = require('./dump/words.json');
+const dump = require('../dump/words.json');
 
 class Cache {
     constructor({ dbCollection, config, env }) {

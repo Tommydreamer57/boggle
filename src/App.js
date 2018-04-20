@@ -9,7 +9,7 @@ import Play from './components/Play/Play';
 // COMPONENTS
 import Modal from './components/Modal/Modal';
 // BOGGLE
-import { boardCreator } from './boggle-creator';
+import Boggle from './boggle-creator';
 // SOCKET
 import io from 'socket.io-client';
 // CSS
@@ -22,7 +22,8 @@ export default class App extends Component {
       currentGames: [],
       joinedGame: {
         dimension: 4,
-        board: []
+        board: [],
+        startTime: new Date(Date.now())
       },
       user: {
         name: ''
@@ -33,16 +34,18 @@ export default class App extends Component {
     socket.on('game joined', this.handleJoinedGame.bind(this));
     socket.on('already joined', this.handleAlreadyJoined.bind(this));
     socket.on('game created', this.handleJoinedGame.bind(this));
+    socket.on('game started', this.handleStartedGame.bind(this));
+    socket.on('game over', this.handleGameOver.bind(this));
     this.socket = socket;
   }
-  mapHistoryToApp({history, params}) {
+  mapHistoryToApp({ history, params }) {
     this.history = history;
     this.params = params;
   }
   receiveGames({ currentGames }) {
     console.log(currentGames);
     this.setState({
-      currentGames
+      currentGames  
     });
   }
   joinGame(gameid) {
@@ -58,15 +61,23 @@ export default class App extends Component {
   }
   handleAlreadyJoined({ joinedGame }) {
     console.log(joinedGame);
-    this.history.push(`/play/${joinedGame._id}`);
+    this.history.push(`/wait/${joinedGame._id}`);
     this.setState({
       joinedGame
+    });
+  }
+  clearJoinedGame() {
+    this.setState({
+      joinedGame: {
+        dimension: 4,
+        board: []
+      }
     });
   }
   createGame() {
     const { joinedGame, user } = this.state
     const { dimension } = joinedGame;
-    const board = boardCreator(dimension);
+    const board = Boggle.boardCreator(dimension);
     const players = [user];
     const game = {
       board,
@@ -74,11 +85,19 @@ export default class App extends Component {
       user,
       players
     }
+    console.log(game);
     this.socket.emit('create game', { game, user });
   }
-  enterGame() {
-    const { _id } = this.state.joinedGame;
+  startGame() {
+    const { _id: gameid } = this.state.joinedGame;
+    this.socket.emit('start game', { gameid })
+  }
+  handleStartedGame({ startedGame }) {
+    const { _id } = startedGame;
     this.history.push(`/play/${_id}`);
+  }
+  handleGameOver() {
+    
   }
   handleUserChange(prop, e) {
     this.setState({
@@ -102,18 +121,19 @@ export default class App extends Component {
     // if (this.params.gameid) this.socket.emit('join game', {})
   }
   render() {
-    console.log(this.state);
+    // console.log(this.state);
     const viewProps = {
       currentGames: this.state.currentGames,
       socket: this.socket,
+      user: this.state.user,
+      joinedGame: this.state.joinedGame,
       joinGame: this.joinGame.bind(this),
       mapHistoryToApp: this.mapHistoryToApp.bind(this),
-      user: this.state.user,
       handleUserChange: this.handleUserChange.bind(this),
-      joinedGame: this.state.joinedGame,
       handleGameChange: this.handleGameChange.bind(this),
       createGame: this.createGame.bind(this),
-      enterGame: this.enterGame.bind(this)
+      startGame: this.startGame.bind(this),
+      clearJoinedGame: this.clearJoinedGame.bind(this)
     }
     return (
       <div className="App">
