@@ -8,7 +8,7 @@ export default class Start extends Component {
     componentDidMount() {
         const { history, match } = this.props;
         const { params } = match;
-        this.props.mapHistoryToApp({ history, params });
+        this.props.registerHistory({ history, params });
     }
     render() {
         const { createGame, user, handleUserChange, joinedGame, handleGameChange } = this.props;

@@ -5,9 +5,9 @@ import Modal from '../Modal/Modal';
 export default class Join extends Component {
     constructor(props) {
         super(props);
-        const { mapHistoryToApp, match, history } = props;
+        const { registerHistory, match, history } = props;
         const { params } = history;
-        mapHistoryToApp({ history, params });
+        registerHistory({ history, params });
         this.state = {
             modal: false,
             selectedGame: -1

@@ -5,72 +5,41 @@ import Boggle from '../../boggle-creator';
 import Left from './Left/Left';
 import Right from './Right/Right';
 
-const defaultDimension = 5;
-
 export default class Play extends Component {
+    static defaultDimension = 5
     constructor(props) {
         super(props);
 
-        let { joinedGame, match, joinGame, mapHistoryToApp, history, clearJoinedGame } = props;
-        let { board, dimension } = joinedGame;
+        let { joinedGame, match, joinGame, registerHistory, history, clearJoinedGame } = props;
+        let { dimension } = joinedGame;
         let { params } = match;
         let { gameid } = params;
 
-        mapHistoryToApp({ history, params });
+        registerHistory({ history, params });
 
-        if (gameid) {
-            if (!board.length) {
-                board = [];
-                for (let i = 0; i < dimension; i++) {
-                    const row = [];
-                    for (let j = 0; j < dimension; j++) {
-                        row.push(' ');
-                    }
-                    board.push(row);
-                }
-                joinGame(gameid);
-            }
-        }
-        else {
-            clearJoinedGame();
-            board = [
-                ["", "", "", "", ""],
-                ["", "", "", "", ""],
-                ["", "G", "L", "", ""],
-                ["O", "G", "", "E", ""],
-                ["B", "", "", "", ""],
-            ];
-        }
+        const board = [
+            ["", "", "", "", ""],
+            ["", "", "", "", ""],
+            ["", "G", "L", "", ""],
+            ["O", "G", "", "E", ""],
+            ["B", "", "", "", ""]
+        ];
 
         this.state = {
             boggle: new Boggle(board),
-            dimension: defaultDimension,
+            dimension: this.defaultDimension,
             input: '',
             words: [],
             oxfordValidations: [],
             cache: [],
             validating: false
-        }
+        };
 
         this.ctrl = false;
+    }
+    registerChanges(props, value) {
+        let { update } = this;
 
-        this.leftMethods = {
-            resetBoard: this.resetBoard.bind(this, defaultDimension),
-            handleDimensionChange: this.handleChange.bind(this, 'dimension'),
-            onKeyDown: (e) => { e.key === 'Enter' ? this.resetBoard.call(this, this.state.dimension) : null },
-            updateBoard: this.resetBoard.bind(this, this.state.dimension),
-            handleClick: this.handleClick.bind(this),
-            updatePath: this.updatePath.bind(this),
-            addWord: this.addWord.bind(this, this.state.boggle.currentWord, true)
-        }
-        this.rightMethods = {
-            handleInputChange: this.handleChange.bind(this, 'input'),
-            onKeyDown: (e) => { e.key === 'Enter' ? this.addWord.call(this, this.state.input) : null },
-            addWord: this.addWord.bind(this, this.state.input),
-            updatePath: this.updatePath.bind(this),
-            validateWords: this.validateWords.bind(this),
-            resetValidations: this.resetValidations.bind(this)
-        }
     }
     componentDidMount() {
         this.handleChange('input', { target: { value: "BOGGLE" } });
@@ -87,33 +56,6 @@ export default class Play extends Component {
         axios.get('/api/words').then(response => {
             const cache = response.data;
             this.setState({ cache });
-        });
-    }
-    componentWillReceiveProps({ joinedGame }) {
-        if (joinedGame.board.length) {
-            const boggle = new Boggle(joinedGame.board);
-            this.setState({ boggle });
-            // console.log(boggle);
-        }
-    }
-    componentWillUnmount() {
-        const { socket, user, match } = this.props;
-        const { params } = match;
-        const { gameid } = params;
-        const words = this.state.words.map(word => word.value);
-        console.log(user, words);
-        socket.emit('save words', { gameid, user, words });
-    }
-    resetBoard(dimension = defaultDimension) {
-        // console.log(arguments);
-        const boggle = new Boggle(dimension);
-        const input = '';
-        const words = [];
-        this.setState({
-            boggle,
-            input,
-            words,
-            dimension
         });
     }
     handleChange(prop, e) {
@@ -133,26 +75,35 @@ export default class Play extends Component {
             this.updatePath(word);
         }
     }
-    addWord(word, reset) {
-        if (!word) return;
-        word = word.toUpperCase();
-        const update = {};
+    addWord(words, reset, boggle) {
+        if (!words) return;
+        if (!Array.isArray(words)) words = [words];
+        if (!(boggle instanceof Boggle)) boggle = this.state.boggle;
+        console.log(words);
+        
+        const update = {
+            boggle,
+            words: [...this.state.words]
+        };
         if (reset) {
-            update.boggle = this.state.boggle;
-            update.boggle.start(0, 0);
+            update.boggle.startPath(0, 0);
         } else {
             update.input = '';
         }
-        if (!this.state.words.some(obj => obj.value === word)) {
-            const validations = this.state.boggle.validate(word);
-            const newWord = {
-                value: word,
-                validations
+        words.forEach(word => {
+            word = word.toUpperCase();
+            if (!this.state.words.some(obj => obj.value === word)) {
+                const validations = boggle.validate(word);
+                const newWord = {
+                    value: word,
+                    validations
+                }
+                update.words.unshift(newWord);
             }
-            update.words = [newWord, ...this.state.words];
-        }
-        this.setState({ ...update });
-        this.updatePath();
+        });
+        console.log(update)
+        // this.setState({ ...update });
+        this.updatePath(null, update);
     }
     validateWords() {
         let { words, oxfordValidations, cache, validating } = this.state;
@@ -168,11 +119,11 @@ export default class Play extends Component {
 
         this.setState({ validating: true });
 
-        
+
         let request;
 
         if (filteredWords.length) request = axios.post('/api/validate', { words: filteredWords });
-        
+
         else request = new Promise(resolve => setTimeout(resolve.bind(null, { data: [] }), 0));
 
         request.then(response => {
@@ -190,9 +141,9 @@ export default class Play extends Component {
             oxfordValidations: []
         })
     }
-    updatePath(word) {
-        // console.log(word);
-        const { boggle } = this.state;
+    updatePath(word, update) {
+        if (!update || !(update.boggle instanceof Boggle)) update = this.state;
+        const { boggle } = update;
         const { path } = boggle;
         let input = word && word.value ? word.value.toUpperCase() : '';
         if (!word || !input) {
@@ -211,6 +162,7 @@ export default class Play extends Component {
         }
         // console.log(input);
         this.setState({
+            ...update,
             boggle,
             input
         })
@@ -224,7 +176,7 @@ export default class Play extends Component {
 
         const available = path.includes(destination) || path[path.length - 1].adjacentLetterObjects.includes(destination);
 
-        if (!available) boggle.start(coordinates);
+        if (!available) boggle.startPath(coordinates);
         else boggle.move(coordinates);
 
         input = boggle.path.map(letter => letter.value.toUpperCase()).join('');
@@ -242,7 +194,7 @@ export default class Play extends Component {
         const { joinedGame, match } = this.props;
         const { startTime } = joinedGame;
         const { gameid } = match.params;
-        // console.log(this.state);
+        console.log(this.state);
 
         const mappedWords = words.map((word, i) => {
             let selected = word.validations.includes(path);

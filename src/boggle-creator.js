@@ -1,29 +1,3 @@
-export class Letter {
-    constructor(val, previousLetters = []) {
-        if (!val) val = Boggle.getRandomLetter(previousLetters.map(letter => letter.value));
-        val = val[0].toUpperCase() + val.slice(1).toLowerCase();
-        this.value = val;
-        this.coordinates = {};
-    }
-    get adjacentLetters() {
-        const letters = [];
-        for (let prop in this) {
-            if (Boggle.validDirections.includes(prop) && this[prop]) {
-                letters.push(this[prop].value);
-            }
-        }
-        return letters;
-    }
-    get adjacentLetterObjects() {
-        const letters = [];
-        for (let prop in this) {
-            if (Boggle.validDirections.includes(prop) && this[prop]) {
-                letters.push(this[prop]);
-            }
-        }
-        return letters;
-    }
-}
 
 // const board = [
 //     ['K', 'X', 'O', 'Z', 'V', 'F'],
@@ -35,6 +9,16 @@ export class Letter {
 // ];
 
 class Boggle {
+    static validDirections = [
+        'upLeft',
+        'up',
+        'upRight',
+        'right',
+        'downRight',
+        'down',
+        'downLeft',
+        'left'
+    ];
     static frequencies = {
         scrabble: {
             A: 13,
@@ -160,7 +144,7 @@ class Boggle {
         }
         return lettersArr[~~(Math.random() * lettersArr.length)];
     }
-    static boardCreator() {
+    static createBoard() {
         let x, y;
         if (typeof arguments[0] === 'object') {
             x = arguments[0].x;
@@ -186,16 +170,84 @@ class Boggle {
         }
         return board;
     }
-    static validDirections = [
-        'upLeft',
-        'up',
-        'upRight',
-        'right',
-        'downRight',
-        'down',
-        'downLeft',
-        'left'
-    ];
+    static Path = class {
+        constructor({ board, start }) {
+            if (start instanceof Boggle.Letter) {
+                if (!board.some(row => row.includes(letter))) throw new Error('must start at a legitimate coordinate');
+                else this.path = [start];
+            } else if (typeof start === 'object') {
+                let { x, y } = start;
+                if (y < 0 || y >= board.length) throw new Error('must start at a legitimate coordinate - Y: ' + y);
+                if (x < 0 || x >= board[0].length) throw new Error('must start at a legitimate coordinate - X: ' + x);
+                this.path = [board[y][x]];
+            } else throw new Error('must specify starting point');
+
+            for (let direction in Boggle.validDirections) {
+                this[direction] = this.move.bind(this, direction);
+            }
+        }
+        get currentWord() {
+            return this.path.map(letter => letter.value).join('');
+        }
+        get endOfPath() {
+            return this.path[this.path.length - 1];
+        }
+        move(...directions) {
+            if (!this.board.some(row => row.includes(this.path[0]))) throw new Error('must start before moving');
+            if (directions.length === 1 && Array.isArray(directions[0])) directions = directions[0];
+            directions.forEach(direction => {
+                let nextLetter;
+                if (typeof direction === 'object') {
+
+                    let { x, y } = direction;
+
+                    if ((!x && x !== 0) || (!y && y !== 0)) throw new Error('must provide both x and y coordinates');
+                    if ((x < 0 || x >= this.dimensions.x) || (y < 0 || y >= this.dimensions.y)) throw new Error('invalid destination not on board: ' + x + ' ' + y);
+
+                    nextLetter = this.board[y][x];
+
+                    // if (this.path[0] === nextLetter) return this.resetPath();
+                    if (this.path.includes(nextLetter)) {
+                        this.path = this.path.slice(0, this.path.indexOf(nextLetter));
+                        return this;
+                    }
+                    if (!this.path[this.path.length - 1].adjacentLetterObjects.some(letter => letter.coordinates.x === x && letter.coordinates.y === y)) throw new Error('invalid destination: ' + x + ' ' + y);
+
+                } else {
+
+                    if (!Boggle.validDirections.includes(direction)) throw new Error('must specify legitimate direction');
+
+                    nextLetter = this.path[this.path.length - 1][direction];
+
+                    if (!nextLetter) throw new Error('invalid direction from current position');
+                    if (this.path.includes(nextLetter)) throw new Error('letter already used: ' + nextLetter.value);
+
+                }
+                nextLetter && this.path.push(nextLetter);
+            });
+            return this;
+        }
+    }
+    static Letter = class {
+        constructor(val, previousLetters = []) {
+            if (!val) val = Boggle.getRandomLetter(previousLetters.map(letter => letter.value));
+            val = val[0].toUpperCase() + val.slice(1).toLowerCase();
+            this.value = val;
+            this.coordinates = {};
+        }
+        get adjacentLetterObjects() {
+            const letters = [];
+            for (let prop in this) {
+                if (Boggle.validDirections.includes(prop) && this[prop]) {
+                    letters.push(this[prop]);
+                }
+            }
+            return letters;
+        }
+        get adjacentLetters() {
+            return this.adjacentLetterObjects.map(letter => letter.value);
+        }
+    }
     constructor() {
         let board, x, y;
         if (Array.isArray(arguments[0])) {
@@ -222,7 +274,7 @@ class Boggle {
         let previousLetters = [];
         if (board.length) {
             board = board.map(row => row.map(letter => {
-                const newLetter = new Letter(letter, previousLetters);
+                const newLetter = new Boggle.Letter(letter, previousLetters);
                 previousLetters.push(newLetter);
                 return newLetter;
             }));
@@ -232,7 +284,7 @@ class Boggle {
             for (let i = 0; i < y; i++) {
                 const row = [];
                 for (let j = 0; j < x; j++) {
-                    const newLetter = new Letter(null, previousLetters);
+                    const newLetter = new Boggle.Letter(null, previousLetters);
                     previousLetters.push(newLetter);
                     row.push(newLetter);
                 }
@@ -272,11 +324,7 @@ class Boggle {
         }
 
         this.board = board;
-        this.path = [new Letter(' ')];
         this.dimensions = { x, y };
-    }
-    get currentWord() {
-        return this.path.map(letter => letter.value).join('');
     }
     validate(word) {
         if (!word) return [];
@@ -341,7 +389,7 @@ class Boggle {
 
         return validPaths;
     }
-    start(x, y) {
+    startPath(x, y) {
         if (typeof x === 'object') {
             y = x.y;
             x = x.x;
@@ -350,46 +398,9 @@ class Boggle {
         if (y >= this.dimensions.y || y < 0) throw new Error('invalid coordinate y: ' + y);
         if ((!x && x !== 0) || (!y && y !== 0)) throw new Error('must specify coordinates x & y');
         this.path = [this.board[y][x]];
-        return this;
-    }
-    move(...directions) {
-        if (!this.board.some(row => row.includes(this.path[0]))) throw new Error('must start before moving');
-        if (directions.length === 1 && Array.isArray(directions[0])) directions = directions[0];
-        directions.forEach(direction => {
-            let nextLetter;
-            if (typeof direction === 'object') {
-
-                let { x, y } = direction;
-
-                if ((!x && x !== 0) || (!y && y !== 0)) throw new Error('must provide both x and y coordinates');
-                if (x >= this.dimensions.x || y >= this.dimensions.y) throw new Error('invalid destination not on board: ' + x + ' ' + y);
-
-                nextLetter = this.board[y][x];
-
-                if (this.path[0] === nextLetter) return this.resetPath();
-                if (this.path.includes(nextLetter)) {
-                    this.path = this.path.slice(0, this.path.indexOf(nextLetter));
-                    return this;
-                }
-                if (!this.path[this.path.length - 1].adjacentLetterObjects.some(letter => letter.coordinates.x === x && letter.coordinates.y === y)) throw new Error('invalid destination: ' + x + ' ' + y);
-
-            } else {
-
-                if (!Boggle.validDirections.includes(direction)) throw new Error('must specify legitimate direction');
-
-                nextLetter = this.path[this.path.length - 1][direction];
-
-                if (!nextLetter) throw new Error('invalid direction from current position');
-                if (this.path.includes(nextLetter)) throw new Error('letter already used: ' + nextLetter.value);
-
-            }
-            nextLetter && this.path.push(nextLetter);
-        });
-        return this;
-    }
-    resetPath() {
-        this.path = [new Letter(' ')];
-        return this;
+        let { board } = this;
+        let start = { x, y };
+        return new Boggle.Path({ board, start });
     }
 }
 

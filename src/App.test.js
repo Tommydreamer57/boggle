@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import App from './App';
 import { BrowserRouter as Router } from 'react-router-dom';
 // TEST
-import Boggle, { boardCreator, Letter, validDirections } from './boggle-creator';
+import Boggle from './boggle-creator';
 
 it('renders without crashing', () => {
   const div = document.createElement('div');
@@ -87,7 +87,7 @@ describe('boggle creation tests', () => {
       let { board } = boggle;
       board.forEach(row => {
         row.forEach(letter => {
-          expect(letter).toBeInstanceOf(Letter);
+          expect(letter).toBeInstanceOf(Boggle.Letter);
         });
       });
     });
@@ -96,8 +96,8 @@ describe('boggle creation tests', () => {
       let { board } = boggle;
       board.forEach(row => {
         row.forEach(letter => {
-          validDirections.forEach(prop => {
-            expect(letter).toHaveProperty(prop);
+          Boggle.validDirections.forEach(direction => {
+            expect(letter).toHaveProperty(direction);
           });
         });
       });
@@ -116,28 +116,28 @@ describe('boggle creation tests', () => {
   });
   describe('board creator tests', () => {
     test('default dimension', () => {
-      let board = boardCreator();
+      let board = Boggle.createBoard();
       expect(board).toHaveLength(4);
       board.forEach(row => {
         expect(row).toHaveLength(4);
       });
     });
     test('one number argument', () => {
-      let board = boardCreator(3);
+      let board = Boggle.createBoard(3);
       expect(board).toHaveLength(3);
       board.forEach(row => {
         expect(row).toHaveLength(3);
       });
     });
     test('two number arguments', () => {
-      let board = boardCreator(3, 7);
+      let board = Boggle.createBoard(3, 7);
       expect(board).toHaveLength(7);
       board.forEach(row => {
         expect(row).toHaveLength(3);
       });
     });
     test('object argument', () => {
-      let board = boardCreator({ x: 4, y: 8 });
+      let board = Boggle.createBoard({ x: 4, y: 8 });
       expect(board).toHaveLength(8);
       board.forEach(row => {
         expect(row).toHaveLength(4);
@@ -146,13 +146,13 @@ describe('boggle creation tests', () => {
   });
   describe('invalid board creator tests', () => {
     test('one invalid argument - negative', () => {
-      expect(() => boardCreator(-3)).toThrow(/positive/);
+      expect(() => Boggle.createBoard(-3)).toThrow(/positive/);
     });
     test('one valid and one invalid - negative', () => {
-      expect(() => boardCreator(3, -4)).toThrow(/positive/);
+      expect(() => Boggle.createBoard(3, -4)).toThrow(/positive/);
     });
     test('invalid object - negative', () => {
-      expect(() => boardCreator({ x: -2, y: 2 })).toThrow(/positive/);
+      expect(() => Boggle.createBoard({ x: -2, y: 2 })).toThrow(/positive/);
     });
   });
 });
@@ -203,125 +203,127 @@ describe('boggle use tests', () => {
   });
   describe('path creation tests', () => {
     const boggle = new Boggle(5);
-    test('initial path contains one letter', () => {
-      expect(boggle.path).toHaveLength(1);
+    const { board } = boggle;
+    test('no path on boggle object', () => {
+      expect(boggle.path).toBeUndefined();
     });
-    test('initial path not on board', () => {
-      boggle.board.forEach(row => {
-        expect(row).not.toEqual(expect.arrayContaining(boggle.path));
-      });
-    });
+    // test('initial path not on board', () => {
+    //   boggle.board.forEach(row => {
+    //     expect(row).not.toEqual(expect.arrayContaining(boggle.path));
+    //   });
+    // });
     test('starts at correct coordinates - two arguments', () => {
-      boggle.start(0, 0);
-      expect(boggle.path).toHaveLength(1);
-      expect(boggle.path[0]).toBe(boggle.board[0][0]);
+      let path = boggle.startPath(0, 0);
+      expect(path).toHaveLength(1);
+      expect(path[0]).toBe(board[0][0]);
     });
     test('starts at correct coordinates - object argument', () => {
-      boggle.start({ x: 0, y: 0 });
-      expect(boggle.path).toHaveLength(1);
-      expect(boggle.path[0]).toBe(boggle.board[0][0]);
+      let path = boggle.startPath({ x: 0, y: 0 });
+      expect(path).toHaveLength(1);
+      expect(path[0]).toBe(board[0][0]);
     });
     test('can move throughout board', () => {
-      boggle.start(2, 3).move('up').move('right').move('upLeft');
-      expect(boggle.path).toHaveLength(4);
-      expect(boggle.path[0]).toBe(boggle.board[3][2]);
-      expect(boggle.path[1]).toBe(boggle.board[2][2]);
-      expect(boggle.path[2]).toBe(boggle.board[2][3]);
-      expect(boggle.path[3]).toBe(boggle.board[1][2]);
+      let path = boggle.startPath(2, 3).move('up').move('right').move('upLeft');
+      expect(path).toHaveLength(4);
+      expect(path[0]).toBe(board[3][2]);
+      expect(path[1]).toBe(board[2][2]);
+      expect(path[2]).toBe(board[2][3]);
+      expect(path[3]).toBe(board[1][2]);
     });
     test('can move multiple directions in one call', () => {
-      expect(boggle.start(0, 0).move('down', 'right', 'downRight')).toBe(boggle);
-      expect(boggle.path).toHaveLength(4);
-      expect(boggle.path[0]).toBe(boggle.board[0][0]);
-      expect(boggle.path[1]).toBe(boggle.board[1][0]);
-      expect(boggle.path[2]).toBe(boggle.board[1][1]);
-      expect(boggle.path[3]).toBe(boggle.board[2][2]);
+      let path = boggle.startPath(0, 0).move('down', 'right', 'downRight');
+      expect(path).toHaveLength(4);
+      expect(path[0]).toBe(board[0][0]);
+      expect(path[1]).toBe(board[1][0]);
+      expect(path[2]).toBe(board[1][1]);
+      expect(path[3]).toBe(board[2][2]);
     });
     test('can move to specific coordinates', () => {
-      expect(boggle.start(0, 0).move({ x: 1, y: 1 }, { x: 2, y: 2 })).toBe(boggle);
-      expect(boggle.path).toHaveLength(3);
-      expect(boggle.path[0]).toBe(boggle.board[0][0]);
-      expect(boggle.path[1]).toBe(boggle.board[1][1]);
-      expect(boggle.path[2]).toBe(boggle.board[2][2]);
+      let path = boggle.startPath(0, 0).move({ x: 1, y: 1 }, { x: 2, y: 2 });
+      expect(path).toHaveLength(3);
+      expect(path[0]).toBe(board[0][0]);
+      expect(path[1]).toBe(board[1][1]);
+      expect(path[2]).toBe(board[2][2]);
     });
-    test('move to path[0] resets path', () => {
-      expect(boggle.start(0, 0).move('down', 'down', 'down', { x: 0, y: 0 })).toBe(boggle);
-      expect(boggle.path).toHaveLength(1);
-      boggle.board.forEach(row => {
-        expect(row).not.toEqual(expect.arrayContaining(boggle.path));
-      });
-    });
+    // test('move to path[0] resets path', () => {
+    //   let path = boggle.startPath(0, 0).move('down', 'down', 'down', { x: 0, y: 0 });
+    //   expect(path).toHaveLength(1);
+    //   board.forEach(row => {
+    //     expect(row).not.toEqual(expect.arrayContaining(path));
+    //   });
+    // });
     test('move to path[>0] chops off path at that point', () => {
-      expect(boggle.start(0, 0).move('down', 'right', 'down', { x: 0, y: 1 })).toBe(boggle);
+      expect(boggle.startPath(0, 0).move('down', 'right', 'down', { x: 0, y: 1 })).toBe(boggle);
       expect(boggle.path).toHaveLength(1);
       expect(boggle.path[0]).toBe(boggle.board[0][0]);
     });
-    test('can reset path', () => {
-      boggle.start(0, 0).move('down').move('right');
-      boggle.resetPath();
-      expect(boggle.path).toHaveLength(1);
-      boggle.board.forEach(row => {
-        expect(row).not.toEqual(expect.arrayContaining(boggle.path));
-      });
+    // test('can reset path', () => {
+    //   boggle.startPath(0, 0).move('down').move('right');
+    //   boggle.resetPath();
+    //   expect(boggle.path).toHaveLength(1);
+    //   boggle.board.forEach(row => {
+    //     expect(row).not.toEqual(expect.arrayContaining(boggle.path));
+    //   });
+    // });
+    test('start returns new path object', () => {
+      expect(boggle.startPath(0, 0)).toBeInstanceOf(Boggle.Path);
     });
-    test('start returns boggle object', () => {
-      expect(boggle.start(0, 0)).toBe(boggle);
+    test('move returns path object', () => {
+      let path = boggle.startPath(0, 0);
+      expect(path.move('down')).toBe(path);
     });
-    test('move returns boggle object', () => {
-      expect(boggle.start(0, 0).move('down')).toBe(boggle);
-    });
-    test('reset returns boggle object', () => {
-      expect(boggle.start(0, 0).move('downRight').resetPath()).toBe(boggle);
-    });
+    // test('reset returns path object', () => {
+    //   expect(boggle.startPath(0, 0).move('downRight').resetPath()).toBe(boggle);
+    // });
     test('can get current word from path', () => {
       let boggle = new Boggle([
         ['a', 'b', 'c'],
         ['d', 'e', 'f'],
         ['g', 'h', 'i']
       ]);
-      expect(boggle.start(0, 0).move('down', 'down', 'right').currentWord).toEqual('ADGH');
-      expect(boggle.start(2, 0).move('down', 'down', 'left').currentWord).toEqual('CFIH');
-      expect(boggle.start(1, 1).move({ x: 2, y: 0 }, 'left', { x: 0, y: 0 }).currentWord).toEqual('ECBA');
+      expect(boggle.startPath(0, 0).move('down', 'down', 'right').currentWord).toEqual('ADGH');
+      expect(boggle.startPath(2, 0).move('down', 'down', 'left').currentWord).toEqual('CFIH');
+      expect(boggle.startPath(1, 1).move({ x: 2, y: 0 }, 'left', { x: 0, y: 0 }).currentWord).toEqual('ECBA');
     });
   });
   describe('invalid path creation tests', () => {
     const boggle = new Boggle(5);
     test('invalid starting point - negative value', () => {
-      expect(() => boggle.start(0, -1)).toThrow(/invalid/);
+      expect(() => boggle.startPath(0, -1)).toThrow(/invalid/);
     });
     test('invalid starting point - not on board', () => {
-      expect(() => boggle.start(0, 5)).toThrow(/invalid/);
+      expect(() => boggle.startPath(0, 5)).toThrow(/invalid/);
     });
     test('invalid starting point - object', () => {
-      expect(() => boggle.start({ x: -1, y: 4 })).toThrow(/invalid/);
+      expect(() => boggle.startPath({ x: -1, y: 4 })).toThrow(/invalid/);
     });
     test('cannot move before starting path', () => {
       expect(() => boggle.resetPath().move()).toThrow(/before/);
     });
     test('invalid direction - misspelled', () => {
-      expect(() => boggle.start(0, 0).move('downnn')).toThrow(/direction/);
-      expect(() => boggle.start(0, 0).move('down').move('right').move('upright')).toThrow(/direction/);
+      expect(() => boggle.startPath(0, 0).move('downnn')).toThrow(/direction/);
+      expect(() => boggle.startPath(0, 0).move('down').move('right').move('upright')).toThrow(/direction/);
     });
     test('invalid direction - outside of board', () => {
-      expect(() => boggle.start(0, 0).move('up')).toThrow(/direction/);
-      expect(() => boggle.start(0, 0).move('left')).toThrow(/direction/);
+      expect(() => boggle.startPath(0, 0).move('up')).toThrow(/direction/);
+      expect(() => boggle.startPath(0, 0).move('left')).toThrow(/direction/);
     });
     test('invalid direction - already used', () => {
-      expect(() => boggle.start(0, 0).move('right').move('left')).toThrow(/already/);
-      expect(() => boggle.start(0, 0).move('down').move('up')).toThrow(/already/);
+      expect(() => boggle.startPath(0, 0).move('right').move('left')).toThrow(/already/);
+      expect(() => boggle.startPath(0, 0).move('down').move('up')).toThrow(/already/);
     });
     test('invalid destination - missing coordinate', () => {
-      expect(() => boggle.start(0, 0).move('down', { x: 0 })).toThrow(/both/);
-      expect(() => boggle.start(2, 1).move('down', { y: 1 })).toThrow(/both/);
+      expect(() => boggle.startPath(0, 0).move('down', { x: 0 })).toThrow(/both/);
+      expect(() => boggle.startPath(2, 1).move('down', { y: 1 })).toThrow(/both/);
     });
     test('invalid destination - negative', () => {
-      expect(() => boggle.start(0, 0).move('down', 'down', 'down', { x: -1, y: 0 })).toThrow(/invalid/);
+      expect(() => boggle.startPath(0, 0).move('down', 'down', 'down', { x: -1, y: 0 })).toThrow(/invalid/);
     });
     test('invalid destination - not on board', () => {
-      expect(() => boggle.start(0, 0).move({ x: 0, y: 5 })).toThrow(/invalid/);
+      expect(() => boggle.startPath(0, 0).move({ x: 0, y: 5 })).toThrow(/invalid/);
     });
     test('invalid destination - not adjacent to path end', () => {
-      expect(() => boggle.start(0, 0).move('down', 'down', { x: 2, y: 0 })).toThrow(/invalid/);
+      expect(() => boggle.startPath(0, 0).move('down', 'down', { x: 2, y: 0 })).toThrow(/invalid/);
     })
   });
 });

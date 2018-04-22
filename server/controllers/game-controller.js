@@ -54,9 +54,12 @@ module.exports = {
             console.log(joinedGame);
 
             let players = joinedGame.players || [];
-
-            if (players.some(player => player.name === user.name)) return io.to(gameid).emit('already joined', { joinedGame });
-
+            
+            if (players.some(player => player.name === user.name)) {
+                user = players.find(player => player.name === user.name);
+                return io.to(gameid).emit('already joined', { joinedGame, user });
+            }
+            
             players.push(Game.createUser(user));
 
             bg.findAndModify({ _id: ObjectId(gameid) }, [], { $set: { players } }, { new: true }).then(results => {

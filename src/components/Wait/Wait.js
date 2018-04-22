@@ -1,9 +1,9 @@
 import React from 'react';
 
-export default function Wait({ startGame, mapHistoryToApp, history, match, user, joinedGame, joinGame }) {
+export default function Wait({ startGame, registerHistory, history, match, user, joinedGame, joinGame }) {
     const { params } = match;
     if (params.gameid && !joinedGame.board.length) joinGame(params.gameid);
-    mapHistoryToApp({ history, params });
+    registerHistory({ history, params });
     return (
         <div className="Wait" >
             <div className="game" >PLAYING AS: {user.name}</div>

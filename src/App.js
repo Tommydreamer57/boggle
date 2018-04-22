@@ -5,7 +5,9 @@ import Landing from './components/Landing/Landing';
 import Start from './components/Start/Start';
 import Join from './components/Join/Join';
 import Wait from './components/Wait/Wait';
-import Play from './components/Play/Play';
+import Compete from './components/Play/Compete';
+import Freeplay from './components/Play/Freeplay';
+import Results from './components/Results/Results';
 // COMPONENTS
 import Modal from './components/Modal/Modal';
 // BOGGLE
@@ -38,32 +40,38 @@ export default class App extends Component {
     socket.on('game over', this.handleGameOver.bind(this));
     this.socket = socket;
   }
-  mapHistoryToApp({ history, params }) {
+  registerHistory({ history, params }) {
     this.history = history;
     this.params = params;
   }
   receiveGames({ currentGames }) {
     console.log(currentGames);
     this.setState({
-      currentGames  
+      currentGames
     });
   }
   joinGame(gameid) {
     const { user } = this.state;
+    if (!user.name) return console.log('MUST ADD USER FIRST');
     this.socket.emit('join game', { gameid, user });
   }
   handleJoinedGame({ joinedGame }) {
     console.log(joinedGame);
-    this.history.push(`/wait/${joinedGame._id}`);
+    if (joinedGame.startTime) this.history.push(`/compete/${joinedGame._id}`);
+    else this.history.push(`/wait/${joinedGame._id}`);
     this.setState({
       joinedGame
     });
   }
-  handleAlreadyJoined({ joinedGame }) {
+  handleAlreadyJoined({ joinedGame, user }) {
     console.log(joinedGame);
-    this.history.push(`/wait/${joinedGame._id}`);
+    console.log(user);
+    if (joinedGame.startTime) this.history.push(`/compete/${joinedGame._id}`);
+    else this.history.push(`/wait/${joinedGame._id}`);
+    if (user.name !== this.state.user.name) user = this.state.user;
     this.setState({
-      joinedGame
+      joinedGame,
+      user
     });
   }
   clearJoinedGame() {
@@ -77,7 +85,7 @@ export default class App extends Component {
   createGame() {
     const { joinedGame, user } = this.state
     const { dimension } = joinedGame;
-    const board = Boggle.boardCreator(dimension);
+    const board = Boggle.createBoard(dimension);
     const players = [user];
     const game = {
       board,
@@ -97,7 +105,7 @@ export default class App extends Component {
     this.history.push(`/play/${_id}`);
   }
   handleGameOver() {
-    
+
   }
   handleUserChange(prop, e) {
     this.setState({
@@ -128,7 +136,7 @@ export default class App extends Component {
       user: this.state.user,
       joinedGame: this.state.joinedGame,
       joinGame: this.joinGame.bind(this),
-      mapHistoryToApp: this.mapHistoryToApp.bind(this),
+      registerHistory: this.registerHistory.bind(this),
       handleUserChange: this.handleUserChange.bind(this),
       handleGameChange: this.handleGameChange.bind(this),
       createGame: this.createGame.bind(this),
@@ -179,26 +187,34 @@ export default class App extends Component {
               to="/join"
             />,
             <Wait {...props} {...viewProps} key="WAIT" />
-          ]}
-          />
-          {/* PLAY */}
-          <Route path="/play/:gameid" render={(props) => [
+          ]} />
+          {/* COMPETE */}
+          <Route path="/compete/:gameid" render={(props) => [
             <Modal
               key="LINK"
               className="link end"
               text="END GAME"
               to="/"
             />,
-            <Play {...props} {...viewProps} key="PLAY" />,
+            <Compete {...props} {...viewProps} key="COMPETE" />,
             <Modal
               key="USERNAME"
               className="link username"
               text={this.state.user.name}
               type="display"
             />
-            // <button className="link username"><a href="" >{this.state.user.name || ''}</a></button>
           ]} />
-          {/* FREE PLAY */}
+          {/* RESULTS */}
+          <Route path="/results/:gameid" render={(props) => [
+            <Modal
+              key="LINK"
+              className="link end"
+              text="END GAME"
+              to="/"
+            />,
+            <Results {...props} {...viewProps} key="RESULTS" />
+          ]} />
+          {/* FREEPLAY */}
           <Route path="/play" render={(props) => [
             <Modal
               key="LINK"
@@ -206,7 +222,7 @@ export default class App extends Component {
               text="END GAME"
               to="/"
             />,
-            <Play {...props} {...viewProps} key="PLAY" />
+            <Freeplay {...props} {...viewProps} key="FREEPLAY" />
           ]} />
         </Switch>
       </div>
