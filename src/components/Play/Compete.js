@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import Boggle from '../../boggle-creator';
+import Boggle from '../../boggle-creator/Boggle';
 import Play from './Play';
 import Left from './Left/Left';
 import Right from './Right/Right';

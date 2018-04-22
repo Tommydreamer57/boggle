@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import Boggle from '../../boggle-creator';
+import Boggle from '../../boggle-creator/Boggle';
 import Left from './Left/Left';
 import Right from './Right/Right';
 

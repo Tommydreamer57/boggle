@@ -11,7 +11,7 @@ import Results from './components/Results/Results';
 // COMPONENTS
 import Modal from './components/Modal/Modal';
 // BOGGLE
-import Boggle from './boggle-creator';
+import Boggle from './boggle-creator/Boggle';
 // SOCKET
 import io from 'socket.io-client';
 // CSS
