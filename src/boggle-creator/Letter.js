@@ -1,6 +1,20 @@
 import statics from './statics';
 
 export default class Letter {
+    static default = {
+        value: '',
+        coordinates: { x: -1, y: -1 },
+        adjacentLetterObjects: [this],
+        adjacentLetters: [''],
+        up: this,
+        upRight: this,
+        right: this,
+        downRight: this,
+        down: this,
+        downLeft: this,
+        left: this,
+        upLeft: this
+    }
     constructor(val, previousLetters = []) {
         if (!val) val = statics.getRandomLetter(previousLetters.map(letter => letter.value));
         val = val[0].toUpperCase() + val.slice(1).toLowerCase();

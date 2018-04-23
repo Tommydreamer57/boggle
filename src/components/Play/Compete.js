@@ -12,14 +12,14 @@ export default class Compete extends Play {
             onKeyDown: (e) => { e.key === 'Enter' ? this.resetBoard.call(this, this.state.dimension) : null },
             handleClick: this.handleClick.bind(this),
             updatePath: this.updatePath.bind(this),
-            addWord: this.addWord.bind(this, this.state.boggle.currentWord, true)
+            addWords: this.addWords.bind(this, this.state.boggle.currentWord, true)
         }
     }
     get rightMethods() {
         return {
             handleInputChange: this.handleChange.bind(this, 'input'),
-            onKeyDown: (e) => { e.key === 'Enter' ? this.addWord.call(this, this.state.input) : null },
-            addWord: this.addWord.bind(this, this.state.input),
+            onKeyDown: (e) => { e.key === 'Enter' ? this.addWords.call(this, this.state.input) : null },
+            addWords: this.addWords.bind(this, this.state.input),
             updatePath: this.updatePath.bind(this),
             validateWords: this.validateWords.bind(this),
             resetValidations: this.resetValidations.bind(this)
@@ -30,7 +30,7 @@ export default class Compete extends Play {
         let { boggle } = this.state;
         if (joinedGame.board.length) boggle = new Boggle(joinedGame.board);
         console.log(boggle);
-        if (user.words) this.addWord(user.words, true, boggle);
+        if (user.words) this.addWords(user.words);
         else this.setState({ boggle });
     }
     componentWillUnmount() {

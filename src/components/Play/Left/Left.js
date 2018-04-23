@@ -4,7 +4,7 @@ import Board from './Board/Board';
 import LeftButtons from './LeftButtons/LeftButtons';
 
 export default function Left({ data, methods }) {
-    const { resetBoard, handleDimensionChange, onKeyDown, updateBoard, handleClick, updatePath, addWord } = methods;
+    const { resetBoard, handleDimensionChange, onKeyDown, updateBoard, handleClick, updatePath, addWords } = methods;
     const { dimension, path, board, gameid, startTime } = data;
     return (
         <div className="left" >
@@ -24,7 +24,7 @@ export default function Left({ data, methods }) {
             />
             <LeftButtons
                 updatePath={updatePath}
-                addWord={addWord}
+                addWords={addWords}
             />
         </div>
     )

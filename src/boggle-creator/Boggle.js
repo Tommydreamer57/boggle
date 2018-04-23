@@ -18,6 +18,11 @@ export default class Boggle {
     static frequencies = statics.frequencies
     static getRandomLetter = statics.getRandomLetter
     static createBoard = statics.createBoard
+    static default = {
+        board: [[Letter.default]],
+        x: -1,
+        y: -1
+    }
     constructor() {
         let board, x, y;
         if (Array.isArray(arguments[0])) {
@@ -159,16 +164,28 @@ export default class Boggle {
 
         return validPaths;
     }
-    startPath(x, y) {
-        if (typeof x === 'object') {
-            y = x.y;
-            x = x.x;
-        };
-        if (x >= this.dimensions.x || x < 0) throw new Error('invalid coordinate x: ' + x);
-        if (y >= this.dimensions.y || y < 0) throw new Error('invalid coordinate y: ' + y);
-        if ((!x && x !== 0) || (!y && y !== 0)) throw new Error('must specify coordinates x & y');
+    startPath() {
         let { board } = this;
-        let start = { x, y };
+        let start;
+        if (arguments[0] instanceof Letter) {
+            start = arguments[0];
+        } else {
+            let x, y;
+            if (typeof arguments[0] === 'object') {
+                y = arguments[0].y;
+                x = arguments[0].x;
+            } else if (arguments.length === 2) {
+                x = arguments[0];
+                y = arguments[1];
+            }
+            if (x >= this.dimensions.x || x < 0) throw new Error('invalid coordinate x: ' + x);
+            if (y >= this.dimensions.y || y < 0) throw new Error('invalid coordinate y: ' + y);
+            if ((!x && x !== 0) || (!y && y !== 0)) throw new Error('must specify coordinates x & y');
+            start = { x, y };
+        };
         return new Boggle.Path({ board, start });
+    }
+    createPath(path) {
+        return this.startPath(path[0]).move(...path.slice(1));
     }
 }

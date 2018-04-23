@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-export default function AddWord(props) {
+export default function addWords(props) {
     return (
         <div className="header" >
             {/* <h3>ADD WORDS HERE</h3> */}
@@ -10,7 +10,7 @@ export default function AddWord(props) {
                 onChange={props.handleInputChange}
                 onKeyDown={props.onKeyDown}
             />
-            <button onClick={props.addWord} >ADD WORD</button>
+            <button onClick={props.addWords} >ADD WORD</button>
         </div>
     )
 }

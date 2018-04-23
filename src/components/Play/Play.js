@@ -25,8 +25,12 @@ export default class Play extends Component {
             ["B", "", "", "", ""]
         ];
 
+        const boggle = new Boggle(board);
+        const path = Boggle.Path.default;
+
         this.state = {
-            boggle: new Boggle(board),
+            boggle,
+            path,
             dimension: this.defaultDimension,
             input: '',
             words: [],
@@ -37,16 +41,11 @@ export default class Play extends Component {
 
         this.ctrl = false;
     }
-    registerChanges(props, value) {
-        let { update } = this;
-
-    }
     componentDidMount() {
-        this.handleChange('input', { target: { value: "BOGGLE" } });
         let keyDown = (e) => {
             if (e.key === 'Control' || e.metaKey) this.ctrl = true;
             if (e.key === 'Enter' && this.ctrl) return this.validateWords.call(this);
-            if (e.key === 'Enter') this.addWord.call(this, this.state.input);
+            if (e.key === 'Enter') this.addWords.call(this, this.state.input);
         }
         let keyUp = (e) => {
             if (e.key === 'Control' || e.metaKey) this.ctrl = false;
@@ -75,35 +74,33 @@ export default class Play extends Component {
             this.updatePath(word);
         }
     }
-    addWord(words, reset, boggle) {
+    addWords(words) {
         if (!words) return;
         if (!Array.isArray(words)) words = [words];
-        if (!(boggle instanceof Boggle)) boggle = this.state.boggle;
         console.log(words);
-        
-        const update = {
-            boggle,
-            words: [...this.state.words]
-        };
-        if (reset) {
-            update.boggle.startPath(0, 0);
-        } else {
-            update.input = '';
-        }
-        words.forEach(word => {
-            word = word.toUpperCase();
-            if (!this.state.words.some(obj => obj.value === word)) {
-                const validations = boggle.validate(word);
-                const newWord = {
-                    value: word,
-                    validations
+
+        this.setState((state) => {
+            let update = {
+                ...state,
+                path: Boggle.Path.default,
+                words: [...state.words],
+                input: ''
+            };
+            words.forEach(word => {
+                word = word.toUpperCase();
+                if (!state.words.some(obj => obj.value === word)) {
+                    const validations = state.boggle.validate(word);
+                    const newWord = {
+                        value: word,
+                        validations
+                    }
+                    update.words.unshift(newWord);
                 }
-                update.words.unshift(newWord);
-            }
+            });
+            console.log(update)
+            return update;
         });
-        console.log(update)
-        // this.setState({ ...update });
-        this.updatePath(null, update);
+        this.updatePath();
     }
     validateWords() {
         let { words, oxfordValidations, cache, validating } = this.state;
@@ -118,7 +115,6 @@ export default class Play extends Component {
         }).map(word => word.value);
 
         this.setState({ validating: true });
-
 
         let request;
 
@@ -141,55 +137,63 @@ export default class Play extends Component {
             oxfordValidations: []
         })
     }
-    updatePath(word, update) {
-        if (!update || !(update.boggle instanceof Boggle)) update = this.state;
-        const { boggle } = update;
-        const { path } = boggle;
-        let input = word && word.value ? word.value.toUpperCase() : '';
-        if (!word || !input) {
-            input = '';
-            boggle.resetPath();
-        } else {
-            const { validations } = word;
-            if (!validations.length) {
+    updatePath(word) {
+        this.setState((state) => {
+            let { boggle, path } = state;
+            let input = word && word.value ? word.value.toUpperCase() : '';
+            if (!word || !input) {
                 input = '';
-                boggle.resetPath();
-                return;
+                path = Boggle.Path.default;
+            } else {
+                const { validations } = word;
+                if (!validations.length) {
+                    input = '';
+                    path = Boggle.Path.default;
+                }
+                else {
+                    let index = validations.findIndex(validation => validation.reduce((pass, valid, i) => pass && valid === path.path[i], true));
+                    path = boggle.createPath(word.validations[index + 1] || word.validations[0]);
+                    input = path.path.map(letter => letter.value.toUpperCase()).join('');
+                }
             }
-            let index = validations.indexOf(path);
-            boggle.path = word.validations[index + 1] || word.validations[0];
-            input = boggle.path.map(letter => letter.value.toUpperCase()).join('');
-        }
-        // console.log(input);
-        this.setState({
-            ...update,
-            boggle,
-            input
-        })
+            return {
+                ...state,
+                boggle,
+                path,
+                input
+            }
+        });
     }
     handleClick(coordinates, e) {
-        console.log(coordinates)
-        let { boggle, input } = this.state;
-        const { board, path } = boggle;
-        const { x, y } = coordinates;
-        const destination = board[y][x]
+        this.setState((state) => {
+            let { boggle, path, input } = state;
+            const { board } = boggle;
+            const { x, y } = coordinates;
+            const destination = board[y][x];
 
-        const available = path.includes(destination) || path[path.length - 1].adjacentLetterObjects.includes(destination);
+            if (path.startOfPath === destination) {
+                path = Boggle.Path.default;
+            } else if (path.path.includes(destination) || path.endOfPath.adjacentLetterObjects.includes(destination)) {
+                console.log(coordinates);
+                console.log(destination.coordinates);
+                path.move(coordinates);
+            } else {
+                path = boggle.startPath(coordinates);
+            }
 
-        if (!available) boggle.startPath(coordinates);
-        else boggle.move(coordinates);
+            input = path.currentWord;
 
-        input = boggle.path.map(letter => letter.value.toUpperCase()).join('');
-
-        this.setState({
-            ...this.state,
-            input
+            return {
+                ...state,
+                path,
+                input
+            }
         });
     }
     render() {
         const { leftMethods, rightMethods } = this;
-        const { boggle, words, oxfordValidations, validating, dimension } = this.state;
-        const { board, path, dimensions } = boggle;
+        const { boggle, path, words, oxfordValidations, validating, dimension } = this.state;
+        const { board, dimensions } = boggle;
         const { x: size } = dimensions;
         const { joinedGame, match } = this.props;
         const { startTime } = joinedGame;
@@ -197,7 +201,7 @@ export default class Play extends Component {
         console.log(this.state);
 
         const mappedWords = words.map((word, i) => {
-            let selected = word.validations.includes(path);
+            let selected = word.validations.includes(path.path);
             let valid = word.validations.length > 0;
             let tested = false;
             let defined = false;
@@ -241,7 +245,7 @@ export default class Play extends Component {
             input: this.state.input.toUpperCase(),
             validating,
             words: wordsToDisplay,
-            path,
+            path: path.path,
             gameid
         }
 

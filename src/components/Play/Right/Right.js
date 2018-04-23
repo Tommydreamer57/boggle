@@ -1,18 +1,18 @@
 import React, { Component } from 'react';
-import AddWord from './AddWord/AddWord';
+import AddWords from './AddWords/AddWords';
 import WordList from './WordList/WordList';
 import RightButtons from './RightButtons/RightButtons';
 
 export default function Right({ data, methods }) {
-    const { handleInputChange, onKeyDown, addWord, updatePath, validateWords, resetValidations } = methods;
+    const { handleInputChange, onKeyDown, addWords, updatePath, validateWords, resetValidations } = methods;
     const { input, words, validating } = data;
     return (
         <div className="right">
-            <AddWord
+            <AddWords
                 input={input}
                 handleInputChange={handleInputChange}
                 onKeyDown={onKeyDown}
-                addWord={addWord}
+                addWords={addWords}
             />
             <WordList
                 validating={validating}

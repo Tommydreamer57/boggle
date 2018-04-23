@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function LeftButtons({ updatePath, addWord }) {
+export default function LeftButtons({ updatePath, addWords }) {
     return (
         <div className="buttons" >
             <button onClick={updatePath} >RESET PATH</button>
@@ -9,7 +9,7 @@ export default function LeftButtons({ updatePath, addWord }) {
                     path.map(letter => letter.value.toUpperCase())
                 }
             </h3> */}
-            <button onClick={addWord} >ADD WORD</button>
+            <button onClick={addWords} >ADD WORD</button>
         </div>
     )
 }

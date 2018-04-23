@@ -14,18 +14,22 @@ export default class Freeplay extends Play {
             updateBoard: this.resetBoard.bind(this, this.state.dimension),
             handleClick: this.handleClick.bind(this),
             updatePath: this.updatePath.bind(this),
-            addWord: this.addWord.bind(this, this.state.boggle.currentWord, true)
+            addWords: this.addWords.bind(this, this.state.boggle.currentWord, true)
         }
     }
     get rightMethods() {
         return {
             handleInputChange: this.handleChange.bind(this, 'input'),
-            onKeyDown: (e) => { e.key === 'Enter' ? this.addWord.call(this, this.state.input) : null },
-            addWord: this.addWord.bind(this, this.state.input),
+            onKeyDown: (e) => { e.key === 'Enter' ? this.addWords.call(this, this.state.input) : null },
+            addWords: this.addWords.bind(this, this.state.input),
             updatePath: this.updatePath.bind(this),
             validateWords: this.validateWords.bind(this),
             resetValidations: this.resetValidations.bind(this)
         }
+    }
+    componentDidMount() {
+        super.componentDidMount();
+        this.handleChange('input', { target: { value: "BOGGLE" } });        
     }
     resetBoard(dimension = this.defaultDimension) {
         // console.log(arguments);
