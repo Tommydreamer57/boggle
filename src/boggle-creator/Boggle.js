@@ -101,6 +101,9 @@ export default class Boggle {
         this.board = board;
         this.dimensions = { x, y };
     }
+    get boardValues() {
+        return this.board.map(row => row.map(letter => letter.value));
+    }
     validate(word) {
         if (!word) return [];
         word = word.toUpperCase().split('').reduce((arr, val) => {
@@ -187,5 +190,15 @@ export default class Boggle {
     }
     createPath(path) {
         return this.startPath(path[0]).move(...path.slice(1));
+    }
+    equals(board) {
+        if (board.length !== this.board.length) return false;
+        if (!board.every(row => row.length === this.board.length)) return false;
+        try {
+            return this.boardValues.every((row, i) => row.every((letter, j) => letter.toUpperCase() === board[i][j].value.toUpperCase()));
+        }
+        catch (e) {
+            return false;
+        }
     }
 }

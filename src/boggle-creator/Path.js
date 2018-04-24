@@ -7,7 +7,13 @@ export default class Path {
         path: [Letter.default],
         currentWord: '',
         endOfPath: Letter.default,
-        startOfPath: Letter.default
+        startOfPath: Letter.default,
+        length: 0,
+        equals: () => false,
+        includes: () => false,
+        some: () => false,
+        every: () => false,
+        move: () => Path.default,
     }
     constructor({ board, start }) {
         if (start instanceof Letter) {
@@ -34,6 +40,19 @@ export default class Path {
     }
     get startOfPath() {
         return this.path[0];
+    }
+    get length() {
+        return this.path.length;
+    }
+    // get directions() {
+
+    // }
+    get coordinates() {
+        return this.path.map(letter => letter.coordinates);
+    }
+    equals(path) {
+        return path.length === this.length && path.every((letter, i) => letter === this.path[i]);
+        // return path.length === this.length && path.reduce((equal, letter, i) => equal && letter === this.path[i], true);
     }
     includes(letter) {
         return this.path.includes(letter);

@@ -54,12 +54,12 @@ module.exports = {
             console.log(joinedGame);
 
             let players = joinedGame.players || [];
-            
+
             if (players.some(player => player.name === user.name)) {
                 user = players.find(player => player.name === user.name);
                 return io.to(gameid).emit('already joined', { joinedGame, user });
             }
-            
+
             players.push(Game.createUser(user));
 
             bg.findAndModify({ _id: ObjectId(gameid) }, [], { $set: { players } }, { new: true }).then(results => {
@@ -114,9 +114,14 @@ module.exports = {
             console.log(err);
         });
     },
-    endGame() {
+    endGame({ gameid }) {
         const { app, socket, io } = this;
         console.log('ending game');
-        console.log();
+        const bg = app.get('bg');
+        bg.find({ _id: gameid }).toArray().then(game => {
+            console.log(game);
+            console.log(Game.findWinner(game));
+        });
+        // bg.findAndModify({ _id: ObjectId(gameid) }, [], { $set: {} });
     }
 }

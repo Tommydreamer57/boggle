@@ -7,9 +7,9 @@ describe('path creation tests', () => {
         expect(boggle.path).toBeUndefined();
     });
     test('starts at correct coordinates - two arguments', () => {
-        let path = boggle.startPath(0, 0);
+        let path = boggle.startPath(3, 0);
         expect(path.path).toHaveLength(1);
-        expect(path.path[0]).toBe(board[0][0]);
+        expect(path.path[0]).toBe(board[0][3]);
     });
     test('starts at correct coordinates - object argument', () => {
         let path = boggle.startPath({ x: 0, y: 0 });
@@ -39,6 +39,14 @@ describe('path creation tests', () => {
         expect(path.path[1]).toBe(board[1][1]);
         expect(path.path[2]).toBe(board[2][2]);
     });
+    test('can move through up / down / right / left methods', () => {
+        let path = boggle.startPath(0, 0).down().downRight().left();
+        expect(path.path).toHaveLength(4);
+        expect(path.path[0]).toBe(board[0][0]);
+        expect(path.path[1]).toBe(board[1][0]);
+        expect(path.path[2]).toBe(board[2][1]);
+        expect(path.path[3]).toBe(board[2][0]);
+    });
     test('move to path.path[>0] chops off path at that point', () => {
         let path = boggle.startPath(0, 0).move('down', 'right', 'down', { x: 0, y: 1 });
         expect(path.path).toHaveLength(1);
@@ -51,6 +59,15 @@ describe('path creation tests', () => {
         let path = boggle.startPath(0, 0);
         expect(path.move('down')).toBe(path);
     });
+    test('can access start of path', () => {
+        let path = boggle.startPath(0, 0).down().down().downRight();
+        expect(path.startOfPath).toBe(path.path[0]);
+        expect(path.startOfPath).toBe(board[0][0]);
+    });
+    test('can access end of path', () => {
+        let path = boggle.startPath(0, 0).right().right().downLeft();
+        expect(path.endOfPath).toBe(path.path[path.path.length - 1]);
+    })
     test('can get current word from path', () => {
         let boggle = new Boggle([
             ['a', 'b', 'c'],
@@ -106,9 +123,9 @@ describe('invalid path creation tests', () => {
         expect(() => boggle.startPath(0, 0).move('up')).toThrow(/direction/);
         expect(() => boggle.startPath(0, 0).move('left')).toThrow(/direction/);
     });
-    test('invalid direction - already used', () => {
-        expect(() => boggle.startPath(0, 0).move('right').move('left')).toThrow(/already/);
-        expect(() => boggle.startPath(0, 0).move('down').move('up')).toThrow(/already/);
+    test('invalid direction - start of path', () => {
+        expect(() => boggle.startPath(0, 0).move('right').move('left')).toThrow(/beginning/);
+        expect(() => boggle.startPath(0, 0).move('down').move('up')).toThrow(/beginning/);
     });
     test('invalid destination - missing coordinate', () => {
         expect(() => boggle.startPath(0, 0).move('down', { x: 0 })).toThrow(/both/);
@@ -121,11 +138,14 @@ describe('invalid path creation tests', () => {
         expect(() => boggle.startPath(0, 0).move({ x: 0, y: 5 })).toThrow(/invalid/);
     });
     test('invalid destination - not adjacent to path end', () => {
-        expect(() => boggle.startPath(0, 0).move('down', 'down', { x: 2, y: 0 })).toThrow(/invalid/);
+        expect(() => boggle.startPath(0, 0).move('down', 'down', { x: 2, y: 3 })).toThrow(/invalid/);
     })
     /*
     */
     // test('cannot move before starting path', () => {
     //     expect(() => boggle.resetPath().move()).toThrow(/before/);
+    // });
+    // test('invalid direction - already used', () => {
+    //     expect(() => boggle.startPath(0, 0).move('down', 'down', 'right', 'upLeft')).toThrow(/already/);
     // });
 });

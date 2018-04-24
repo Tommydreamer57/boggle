@@ -40,6 +40,21 @@ export default class App extends Component {
     socket.on('game over', this.handleGameOver.bind(this));
     this.socket = socket;
   }
+  get viewProps() {
+    return {
+      currentGames: this.state.currentGames,
+      socket: this.socket,
+      user: this.state.user,
+      joinedGame: this.state.joinedGame,
+      joinGame: this.joinGame.bind(this),
+      registerHistory: this.registerHistory.bind(this),
+      handleUserChange: this.handleUserChange.bind(this),
+      handleGameChange: this.handleGameChange.bind(this),
+      createGame: this.createGame.bind(this),
+      startGame: this.startGame.bind(this),
+      clearJoinedGame: this.clearJoinedGame.bind(this)
+    }
+  }
   registerHistory({ history, params }) {
     this.history = history;
     this.params = params;
@@ -130,19 +145,8 @@ export default class App extends Component {
   }
   render() {
     // console.log(this.state);
-    const viewProps = {
-      currentGames: this.state.currentGames,
-      socket: this.socket,
-      user: this.state.user,
-      joinedGame: this.state.joinedGame,
-      joinGame: this.joinGame.bind(this),
-      registerHistory: this.registerHistory.bind(this),
-      handleUserChange: this.handleUserChange.bind(this),
-      handleGameChange: this.handleGameChange.bind(this),
-      createGame: this.createGame.bind(this),
-      startGame: this.startGame.bind(this),
-      clearJoinedGame: this.clearJoinedGame.bind(this)
-    }
+    const { viewProps } = this;
+
     return (
       <div className="App">
         <div id="background" />

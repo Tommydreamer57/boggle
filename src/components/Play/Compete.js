@@ -28,17 +28,19 @@ export default class Compete extends Play {
     componentWillReceiveProps({ joinedGame, user }) {
         console.log(user);
         let { boggle } = this.state;
-        if (joinedGame.board.length) boggle = new Boggle(joinedGame.board);
-        console.log(boggle);
+        if (joinedGame.board.length && !boggle.equals(joinedGame.board)) {
+            boggle = new Boggle(joinedGame.board);
+            console.log(boggle);
+            this.setState(() => ({ boggle }));
+        }
         if (user.words) this.addWords(user.words);
-        else this.setState({ boggle });
     }
     componentWillUnmount() {
+        // super.componentWillUnmount();
         const { socket, user, match } = this.props;
         const { params } = match;
         const { gameid } = params;
         const words = this.state.words.map(word => word.value);
-        console.log(user, words);
         socket.emit('save words', { gameid, user, words });
     }
 }
