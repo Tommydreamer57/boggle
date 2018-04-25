@@ -12,7 +12,8 @@ export default class Compete extends Play {
             onKeyDown: (e) => { e.key === 'Enter' ? this.resetBoard.call(this, this.state.dimension) : null },
             handleClick: this.handleClick.bind(this),
             updatePath: this.updatePath.bind(this),
-            addWords: this.addWords.bind(this, this.state.boggle.currentWord, true)
+            addWords: this.addWords.bind(this, this.state.boggle.currentWord, true),
+            endGame: this.props.endGame
         }
     }
     get rightMethods() {

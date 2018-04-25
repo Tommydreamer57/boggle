@@ -298,8 +298,7 @@ export default class Play extends Component {
         const { startTime } = joinedGame;
         const { gameid } = match.params;
 
-        console.log(this.state);
-        console.log(this.props);
+        console.log(this);
 
         const { wordsToDisplay } = this.sortWords(words);
 

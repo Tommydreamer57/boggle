@@ -58,21 +58,22 @@ class Game {
         return players.map(player => {
             let words = player.words.filter(playerWord => {
                 // ONLY RETURN WORDS THAT ARE PRESENT ONLY ONCE
-                let count = allWords.filter(word => word.toUpperCase() === playerWord.toUpperCase());
+                let count = allWords.filter(word => word.toUpperCase() === playerWord.toUpperCase()).length;
                 return count === 1;
             });
-            let points = words.reduce((points, word) => points + Game.countPoints(word), 0);
+            let points = words.reduce((points, word) => points + Game.countPoints(word, boardSize), 0);
             // RETURN THE PLAYER WITH THE UPDATED WORD ARRAY AND POINTS
-            return Object.assign({}, player, words, points);
+            return Object.assign({}, player, { points });
         });
     }
     static findWinner(game) {
         let players = Game.compareWords(game.players, game.board.length)
         let winner = players.reduce((winner, player) => winner.points > player.points ? winner : player);
-        return players.map(player => {
+        players = players.map(player => {
             if (player === winner) return Object.assign({}, player, { winner: true });
             else return Object.assign({}, player, { winner: false });
         });
+        return Object.assign({}, game, { players });
     }
     constructor(game) {
         Object.assign(this, game);

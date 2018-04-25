@@ -118,9 +118,12 @@ module.exports = {
         const { app, socket, io } = this;
         console.log('ending game');
         const bg = app.get('bg');
-        bg.find({ _id: gameid }).toArray().then(game => {
+        bg.find(ObjectId(gameid)).toArray().then(({ 0: game }) => {
             console.log(game);
-            console.log(Game.findWinner(game));
+            let joinedGame = Game.findWinner(game);
+            console.log("CALCULATED WINNER");
+            console.log(joinedGame);
+            io.to(gameid).emit('game over', { joinedGame });
         });
         // bg.findAndModify({ _id: ObjectId(gameid) }, [], { $set: {} });
     }

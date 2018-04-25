@@ -28,10 +28,10 @@ class Counter extends Component {
     }
 }
 
-export default function ResetBoard({ dimension, resetBoard, handleDimensionChange, onKeyDown, updateBoard, gameid, startTime }) {
+export default function ResetBoard({ dimension, resetBoard, handleDimensionChange, onKeyDown, updateBoard, gameid, startTime, endGame }) {
     if (gameid) return (
         <div className="buttons">
-            <button>{}</button>
+            <button onClick={endGame} >END GAME</button>
             <Counter startTime={startTime} />
         </div>
     )

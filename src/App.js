@@ -23,9 +23,22 @@ export default class App extends Component {
     this.state = {
       currentGames: [],
       joinedGame: {
-        dimension: 4,
         board: [],
-        startTime: new Date(Date.now())
+        dimension: 4,
+        startTime: new Date(Date.now()),
+        endTime: null,
+        duration: null,
+        user: {
+          name: ''
+        },
+        players: [
+          {
+            name: '',
+            words: [],
+            points: 0,
+            winner: false
+          }
+        ]
       },
       user: {
         name: ''
@@ -52,6 +65,7 @@ export default class App extends Component {
       handleGameChange: this.handleGameChange.bind(this),
       createGame: this.createGame.bind(this),
       startGame: this.startGame.bind(this),
+      endGame: this.endGame.bind(this),
       clearJoinedGame: this.clearJoinedGame.bind(this)
     }
   }
@@ -119,8 +133,17 @@ export default class App extends Component {
     const { _id } = startedGame;
     this.history.push(`/play/${_id}`);
   }
-  handleGameOver() {
-
+  endGame() {
+    console.log("ENDING GAME");
+    console.log(this.state.joinedGame);
+    const { _id: gameid } = this.state.joinedGame;
+    this.socket.emit('end game', { gameid });
+  }
+  handleGameOver({ joinedGame }) {
+    console.log(joinedGame);
+    const { _id } = joinedGame;
+    this.setState({ joinedGame });
+    this.history.push(`/results/${_id}`);
   }
   handleUserChange(prop, e) {
     this.setState({
