@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-export default function addWords(props) {
+export default function AddWords(props) {
     return (
         <div className="header" >
             {/* <h3>ADD WORDS HERE</h3> */}

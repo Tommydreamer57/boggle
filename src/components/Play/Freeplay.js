@@ -5,7 +5,10 @@ import Play from './Play';
 import Left from './Left/Left';
 import Right from './Right/Right';
 
-export default class Freeplay extends Play {
+// import { connect } from 'react-redux';
+import { actionCreators, connectAll } from '../../ducks/actions';
+
+class Freeplay extends Play {
     get leftMethods() {
         return {
             resetBoard: this.resetBoard.bind(this, this.defaultDimension),
@@ -14,7 +17,7 @@ export default class Freeplay extends Play {
             updateBoard: this.resetBoard.bind(this, this.state.dimension),
             handleClick: this.handleClick.bind(this),
             updatePath: this.updatePath.bind(this),
-            addWords: this.addWords.bind(this, this.state.boggle.currentWord, true)
+            addWords: this.addWords.bind(this, this.state.path.currentWord, true)
         }
     }
     get rightMethods() {
@@ -29,7 +32,7 @@ export default class Freeplay extends Play {
     }
     componentDidMount() {
         super.componentDidMount();
-        this.handleChange('input', { target: { value: "BOGGLE" } });        
+        this.handleChange('input', { target: { value: "BOGGLE" } });
     }
     resetBoard(dimension = this.defaultDimension) {
         // console.log(arguments);
@@ -44,3 +47,5 @@ export default class Freeplay extends Play {
         });
     }
 }
+
+export default connectAll(Freeplay);

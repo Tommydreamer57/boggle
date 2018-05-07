@@ -8,8 +8,8 @@ import Right from './Right/Right';
 export default class Play extends Component {
     static defaultDimension = 5
     constructor(props) {
-        console.log(super(props));
-        
+        super(props);
+        console.log(props);
         // DESTRUCTURING
         let { joinedGame, match, joinGame, registerHistory, history, clearJoinedGame } = props;
         let { dimension } = joinedGame;
@@ -19,11 +19,11 @@ export default class Play extends Component {
         registerHistory({ history, params });
         // CREATE BOARD
         const board = [
-            ["", "", "", "", ""],
-            ["", "", "", "", ""],
-            ["", "G", "L", "", ""],
-            ["O", "G", "", "E", ""],
-            ["B", "", "", "", ""]
+            ["",  "",  "",  "",  ""],
+            ["",  "",  "",  "",  ""],
+            ["",  "G", "L", "",  ""],
+            ["O", "G", "",  "E", ""],
+            ["B", "",  "",  "",  ""]
         ];
         // CREATE BOGGLE FROM BOARD
         const boggle = new Boggle(board);
@@ -73,13 +73,14 @@ export default class Play extends Component {
     // }
     handleChange(prop, e) {
         let value = e.target.value;
+        if (prop === 'input') value = value.toUpperCase().trim();
+        if (prop === 'dimension') value = Number(value);
+        // ADD TO STATE
+        this.setState({
+            [prop]: value
+        });
         if (prop === 'input') {
             // TOUPPERCASE AND TRIM
-            value = value.toUpperCase().trim();
-            // ADD TO STATE
-            this.setState({
-                [prop]: value
-            });
             // CREATE WORD OBJECT
             const validations = this.state.boggle.validate(value);
             const word = {
@@ -166,7 +167,6 @@ export default class Play extends Component {
                 input,
                 words
             }
-            // return update;
         });
         // UPDATE PATH WITH THE NEW CHANGES
         this.updatePath();

@@ -49,7 +49,7 @@ module.exports = {
         socket.join(gameid);
 
         const bg = app.get('bg');
-        bg.find(ObjectId(gameid)).toArray().then(({ 0: joinedGame }) => {
+        bg.find(ObjectId(gameid)).toArray().then(([joinedGame]) => {
 
             console.log(joinedGame);
 
@@ -118,7 +118,7 @@ module.exports = {
         const { app, socket, io } = this;
         console.log('ending game');
         const bg = app.get('bg');
-        bg.find(ObjectId(gameid)).toArray().then(({ 0: game }) => {
+        bg.find(ObjectId(gameid)).toArray().then(([game]) => {
             console.log(game);
             let joinedGame = Game.findWinner(game);
             console.log("CALCULATED WINNER");

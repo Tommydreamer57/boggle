@@ -12,7 +12,7 @@ export default class Compete extends Play {
             onKeyDown: (e) => { e.key === 'Enter' ? this.resetBoard.call(this, this.state.dimension) : null },
             handleClick: this.handleClick.bind(this),
             updatePath: this.updatePath.bind(this),
-            addWords: this.addWords.bind(this, this.state.boggle.currentWord, true),
+            addWords: this.addWords.bind(this, this.state.path.currentWord, true),
             endGame: this.props.endGame
         }
     }
@@ -27,7 +27,7 @@ export default class Compete extends Play {
         }
     }
     componentWillReceiveProps({ joinedGame, user }) {
-        console.log(user);
+        // console.log(user);
         let { boggle } = this.state;
         if (joinedGame.board.length && !boggle.equals(joinedGame.board)) {
             boggle = new Boggle(joinedGame.board);
