@@ -1,318 +1,279 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
+import { Switch, Route, Link } from 'react-router-dom';
+// VIEWS
+import Landing from './components/Landing/Landing';
+import Start from './components/Start/Start';
+import Join from './components/Join/Join';
+import Wait from './components/Wait/Wait';
+import Compete from './components/Play/Compete';
+import Freeplay from './components/Play/Freeplay';
+import Results from './components/Results/Results';
+import Help from './components/Help/Help';
+// COMPONENTS
+import Modal from './components/Modal/Modal';
+// BOGGLE
+import Boggle from './boggle-creator/Boggle';
+// SOCKET
+import io from 'socket.io-client';
+// CSS
 import './App.css';
-import Boggle from './components/Boggle';
-import axios from 'axios';
 
-const defaultDimension = 5
-
-class App extends Component {
-  constructor() {
-    super();
-
-    const boggle = new Boggle([
-      ["", "", "", "", ""],
-      ["", "", "", "", ""],
-      ["", "G", "L", "", ""],
-      ["O", "G", "", "E", ""],
-      ["B", "", "", "", ""],
-    ]);
-
-    this.state = {
-      boggle,
-      dimension: defaultDimension,
-      input: '',
-      words: [],
-      oxfordValidations: [],
-      cache: [],
-      validating: false
-    }
-
-    this.ctrl = false;
-
-  }
-  componentDidMount() {
-    this.handleChange('input', { target: { value: "BOGGLE" } });
-    function keyDown(e) {
-      if (e.key === 'Control' || e.metaKey) this.ctrl = true;
-      if (e.key === 'Enter' && this.ctrl) return this.validateWords.call(this);
-      if (e.key === 'Enter') this.addWord.call(this, this.state.input);
-    }
-    function keyUp(e) {
-      if (e.key === 'Control' || e.metaKey) this.ctrl = false;
-    }
-    window.addEventListener('keydown', keyDown.bind(this));
-    window.addEventListener('keyup', keyUp.bind(this));
-    axios.get('/api/words').then(response => {
-      const cache = response.data;
-      this.setState({ cache });
-    });
-  }
-  resetBoard(dimension = defaultDimension) {
-    console.log(arguments);
-    const boggle = new Boggle(dimension);
-    const input = '';
-    const words = [];
-    this.setState({
-      boggle,
-      input,
-      words,
-      dimension
-    });
-  }
-  handleChange(prop, e) {
-    console.log(prop, e.target.value);
-    let value = e.target.value;
-    if (prop === 'input') value = value.toUpperCase().trim();
-    this.setState({
-      [prop]: value
-    })
-    if (prop === 'input') {
-      const validations = this.state.boggle.validate(value);
-      const word = {
-        value,
-        validations
-      };
-      console.log(word);
-      this.updatePath(word);
-    }
-  }
-  addWord(word, reset) {
-    if (!word) return;
-    word = word.toUpperCase();
-    const update = {};
-    if (reset) {
-      update.boggle = this.state.boggle;
-      update.boggle.start(0, 0);
-    } else {
-      update.input = '';
-    }
-    if (!this.state.words.some(obj => obj.value === word)) {
-      const validations = this.state.boggle.validate(word);
-      const newWord = {
-        value: word,
-        validations
-      }
-      update.words = [newWord, ...this.state.words];
-    }
-    this.setState({ ...update });
-    this.updatePath();
-  }
-  validateWords() {
-    let { words, oxfordValidations, cache, validating } = this.state;
-
-    // PREVENT FREQUENT REQUESTS
-    if (validating) return;
-
-    words = words.filter(word => {
-      let valid = word.validations.length;
-      let tested = cache.some(validation => validation.value.toUpperCase() === word.value.toUpperCase());
-      return valid && !tested;
-    }).map(word => word.value);
-
-    this.setState({ validating: true });
-
-    axios.post('/api/validate', { words }).then(response => {
-      console.log(response.data);
-      cache = [...cache, ...response.data];
-      oxfordValidations = cache;
-      setTimeout(() => this.setState({ cache, oxfordValidations, validating: false }), 500);
-    });
-  }
-  resetValidations() {
-    this.setState({
-      oxfordValidations: []
-    })
-  }
-  updatePath(word) {
-    console.log(word);
-    const { boggle } = this.state;
-    const { path } = boggle;
-    let input = word && word.value ? word.value.toUpperCase() : '';
-    if (!word || !input) {
-      input = '';
-      boggle.resetPath();
-    } else {
-      const { validations } = word;
-      if (!validations.length) {
-        input = '';
-        boggle.resetPath();
-        return;
-      }
-      let index = validations.indexOf(path);
-      boggle.path = word.validations[index + 1] || word.validations[0];
-      input = boggle.path.map(letter => letter.value.toUpperCase()).join('');
-    }
-    console.log(input);
-    this.setState({
-      boggle,
-      input
-    })
-  }
-  handleClick(coordinates, e) {
-    console.log(coordinates)
-    let { boggle, input } = this.state;
-    const { board, path } = boggle;
-    const { x, y } = coordinates;
-    const destination = board[y][x]
-
-    const available = path.includes(destination) || path[path.length - 1].adjacentLetterObjects.includes(destination);
-
-    if (!available) boggle.start(coordinates);
-    else boggle.move(coordinates);
-
-    input = boggle.path.map(letter => letter.value.toUpperCase()).join('');
-
-    this.setState({
-      ...this.state,
-      input
-    });
-  }
-  render() {
-    const { boggle, words, oxfordValidations, validating } = this.state;
-    const { board, path, dimensions } = boggle;
-    const { x: size } = dimensions;
-    console.log(this.state);
-
-    const mappedWords = words.map((word, i) => {
-      let selected = word.validations.includes(path);
-      let valid = word.validations.length > 0;
-      let tested = false;
-      let defined = false;
-      let oxfordValidation = oxfordValidations.find(validation => validation.value.toUpperCase() === word.value.toUpperCase());
-      if (oxfordValidation && valid) {
-        tested = true
-        defined = oxfordValidation.defined;
-      }
-      return {
-        ...word,
-        selected,
-        valid,
-        tested,
-        defined
-      }
-    });
-
-    const untestedWords = [];
-    const definedWords = [];
-    const undefinedWords = [];
-    const invalidWords = [];
-
-    mappedWords.forEach(word => {
-      if (!word.valid) return invalidWords.push(word);
-      if (!word.tested) return untestedWords.push(word);
-      if (!word.defined) return undefinedWords.push(word);
-      if (word.defined) return definedWords.push(word);
-    });
-
-    const wordsToDisplay = [...untestedWords, ...definedWords, ...undefinedWords, ...invalidWords];
-
-    return (
-      <div className="App" >
-        <div className="left" >
-          <div className="buttons" >
-            <button onClick={this.resetBoard.bind(this, defaultDimension)} >RESET BOARD</button>
-            <input
-              type='number'
-              min={3}
-              max={9}
-              value={this.state.dimension}
-              onChange={this.handleChange.bind(this, 'dimension')}
-              onKeyDown={e => e.key === 'Enter' ? this.resetBoard.call(this, this.state.dimension) : null}
-            />
-            <button onClick={this.resetBoard.bind(this, this.state.dimension)} >UPDATE BOARD</button>
-          </div>
-          <table id="board" >
-            <tbody className="board" >
-              {
-                board.map((row, i) => (
-                  <tr key={`Row: ${i}`} className="row" >
+export default class App extends Component {
+    constructor() {
+        super();
+        this.state = {
+            currentGames: [],
+            joinedGame: {
+                board: [],
+                dimension: 4,
+                startTime: new Date(Date.now()),
+                endTime: null,
+                duration: null,
+                user: {
+                    name: ''
+                },
+                players: [
                     {
-                      row.map((letter, j) => {
-                        let index = path.indexOf(letter) + 1;
-                        let last = path[path.length - 1] === letter;
-                        let used = path.includes(letter) && !last;
-                        let available = path[path.length - 1].adjacentLetterObjects.includes(letter) && !used;
-                        return (
-                          <td
-                            key={`Letter: X: ${j}, Y: ${i}`}
-                            className="cell"
-                            onClick={this.handleClick.bind(this, letter.coordinates)}
-                          >
-                            <div className={`letter ${used ? 'used' : ''} ${available ? 'available' : ''} ${last ? 'last' : ''}`} >
-                              <div className="circle" >
-                                {
-                                  index ?
-                                    <div className="index" >{index}</div>
-                                    :
-                                    null
-                                }
-                                {letter.value}
-                              </div>
-                            </div>
-                          </td>
-                        )
-                      })
+                        name: '',
+                        words: [],
+                        points: 0,
+                        winner: false
                     }
-                  </tr>
-                ))
-              }
-            </tbody>
-          </table>
-          <div className="buttons" >
-            <button onClick={this.updatePath.bind(this)} >RESET PATH</button>
-            {/* <h3>
-              {
-                path.map(letter => letter.value.toUpperCase())
-              }
-            </h3> */}
-            <button onClick={this.addWord.bind(this, path.map(letter => letter.value).join(''), true)} >ADD WORD</button>
-          </div>
-        </div>
-        <div id="divider" />
-        <div className="right">
-          <div className="header" >
-            {/* <h3>ADD WORDS HERE</h3> */}
-            <input
-              placeholder="Type a word here..."
-              value={this.state.input.toUpperCase()}
-              onChange={this.handleChange.bind(this, 'input')}
-              onKeyDown={e => e.key === 'Enter' ? this.addWord.call(this, this.state.input) : null}
-            />
-            <button onClick={this.addWord.bind(this, this.state.input)} >ADD WORD</button>
-          </div>
-          <div className={`body ${validating ? 'validating' : ''}`} >
-            {
-              !words.length ?
-                <button className="word" >Your words will show up here...</button>
-                :
-                null
+                ]
+            },
+            user: {
+                name: ''
             }
-            {
-              wordsToDisplay.map((word, i) => {
-                let { selected, valid, tested, defined, value } = word;
-                console.log(selected, valid, tested, defined);
-                return (
-                  <button
-                    key={`WORD: ${value}`}
-                    className={`word ${valid ? 'valid' : 'invalid'} ${selected ? 'selected' : ''} ${defined ? 'defined' : 'undefined'} ${tested ? '' : 'untested'}`}
-                    onClick={this.updatePath.bind(this, word)}
-                  >
-                    {word.value.toUpperCase() + ' (' + word.validations.length + ')'}
-                    {word.validations.indexOf(path) + 1 ? ' - (' + (word.validations.indexOf(path) + 1) + ')' : ''}
-                  </button>
-                )
-              })
+        }
+        const socket = io('/');
+        // socket.on('games found', this.receiveGames.bind(this));
+        // socket.on('game joined', this.handleJoinedGame.bind(this));
+        // socket.on('already joined', this.handleAlreadyJoined.bind(this));
+        // socket.on('game created', this.handleJoinedGame.bind(this));
+        // socket.on('game started', this.handleStartedGame.bind(this));
+        // socket.on('game over', this.handleGameOver.bind(this));
+        this.socket = socket;
+    }
+    get viewProps() {
+        return {
+            currentGames: this.state.currentGames,
+            socket: this.socket,
+            user: this.state.user,
+            joinedGame: this.state.joinedGame,
+            joinGame: this.joinGame.bind(this),
+            registerHistory: this.registerHistory.bind(this),
+            handleUserChange: this.handleUserChange.bind(this),
+            handleGameChange: this.handleGameChange.bind(this),
+            createGame: this.createGame.bind(this),
+            startGame: this.startGame.bind(this),
+            endGame: this.endGame.bind(this),
+            clearJoinedGame: this.clearJoinedGame.bind(this)
+        }
+    }
+    registerHistory({ history, params }) {
+        this.history = history;
+        this.params = params;
+    }
+    receiveGames({ currentGames }) {
+        // console.log(currentGames);
+        this.setState({
+            currentGames
+        });
+    }
+    joinGame(gameid) {
+        const { user } = this.state;
+        if (!user.name) return console.log('MUST ADD USER FIRST');
+        this.socket.emit('join game', { gameid, user });
+    }
+    handleJoinedGame({ joinedGame }) {
+        // console.log(joinedGame);
+        if (joinedGame.startTime) this.history.push(`/compete/${joinedGame._id}`);
+        else this.history.push(`/wait/${joinedGame._id}`);
+        this.setState({
+            joinedGame
+        });
+    }
+    handleAlreadyJoined({ joinedGame, user }) {
+        // console.log(joinedGame);
+        // console.log(user);
+        if (joinedGame.startTime) this.history.push(`/compete/${joinedGame._id}`);
+        else this.history.push(`/wait/${joinedGame._id}`);
+        if (user.name !== this.state.user.name) user = this.state.user;
+        this.setState({
+            joinedGame,
+            user
+        });
+    }
+    clearJoinedGame() {
+        this.setState({
+            joinedGame: {
+                dimension: 4,
+                board: []
             }
-          </div>
-          <div className="right-buttons" >
-            <button onClick={this.validateWords.bind(this)} >VALIDATE WORDS</button>
-            <button onClick={this.resetValidations.bind(this)} >RESET VALIDATIONS</button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-}
+        });
+    }
+    createGame() {
+        const { joinedGame, user } = this.state
+        const { dimension } = joinedGame;
+        const board = Boggle.createBoard(dimension);
+        const players = [user];
+        const game = {
+            board,
+            dimension,
+            user,
+            players
+        }
+        // console.log(game);
+        this.socket.emit('create game', { game, user });
+    }
+    startGame() {
+        const { _id: gameid } = this.state.joinedGame;
+        this.socket.emit('start game', { gameid })
+    }
+    handleStartedGame({ startedGame }) {
+        const { _id } = startedGame;
+        this.history.push(`/play/${_id}`);
+    }
+    endGame() {
+        // console.log("ENDING GAME");
+        // console.log(this.state.joinedGame);
+        const { _id: gameid } = this.state.joinedGame;
+        this.socket.emit('end game', { gameid });
+    }
+    handleGameOver({ joinedGame }) {
+        // console.log(joinedGame);
+        const { _id } = joinedGame;
+        this.setState({ joinedGame });
+        this.history.push(`/results/${_id}`);
+    }
+    handleUserChange(prop, e) {
+        this.setState({
+            user: {
+                ...this.state.user,
+                [prop]: e.target.value
+            }
+        })
+    }
+    handleGameChange(prop, e) {
+        if (prop === "dimension" && (e.target.value < 3 || e.target.value > 9)) return;
+        this.setState({
+            joinedGame: {
+                ...this.state.joinedGame,
+                [prop]: e.target.value
+            }
+        })
+    }
+    componentDidMount() {
+        this.socket.emit('find games');
+        // if (this.params.gameid) this.socket.emit('join game', {})
+    }
+    render() {
+        // console.log(this.state);
+        const { viewProps } = this;
 
-export default App;
+        return (
+            <div className="App">
+                <div id="background" />
+                <div id="background-cover" />
+                <Switch>
+                    {/* LANDING */}
+                    <Route exact path="/" render={(props) => [
+                        <Modal
+                            key="LINK"
+                            className="link start"
+                            text={[
+                                // "START GAME",
+                                // "JOIN GAME",
+                                // "LEARN",
+                                "FREE PLAY",
+                            ]}
+                            to={[
+                                // "/start",
+                                // "/join",
+                                // "/help",
+                                "/play",
+                            ]}
+                        />,
+                        <Landing {...props} {...viewProps} key="LANDING" />
+                    ]} />
+                    {/* START */}
+                    {/* <Route path="/start" render={(props) => [
+                        <Modal
+                            key="LINK"
+                            className="link end"
+                            text="BACK"
+                            to="/"
+                        />,
+                        <Start {...props} {...viewProps} key="START" />
+                    ]} /> */}
+                    {/* JOIN */}
+                    {/* <Route path="/join" render={(props) => [
+                        <Modal
+                            key="LINK"
+                            className="link end"
+                            text="BACK"
+                            to="/"
+                        />,
+                        <Join {...props} {...viewProps} key="JOIN" />
+                    ]} /> */}
+                    {/* WAIT */}
+                    {/* <Route path="/wait/:gameid" render={(props) => [
+                        <Modal
+                            key="LINK"
+                            className="link end"
+                            text="EXIT"
+                            to="/join"
+                        />,
+                        <Wait {...props} {...viewProps} key="WAIT" />
+                    ]} /> */}
+                    {/* COMPETE */}
+                    {/* <Route path="/compete/:gameid" render={(props) => [
+                        <Modal
+                            key="LINK"
+                            className="link end"
+                            text="END GAME"
+                            to="/"
+                        />,
+                        <Compete {...props} {...viewProps} key="COMPETE" />,
+                        <Modal
+                            key="USERNAME"
+                            className="link username"
+                            text={this.state.user.name}
+                            type="display"
+                        />
+                    ]} /> */}
+                    {/* RESULTS */}
+                    {/* <Route path="/results/:gameid" render={(props) => [
+                        <Modal
+                            key="LINK"
+                            className="link end"
+                            text="END GAME"
+                            to="/"
+                        />,
+                        <Results {...props} {...viewProps} key="RESULTS" />
+                    ]} /> */}
+                    {/* FREEPLAY */}
+                    <Route path="/play" render={(props) => [
+                        <Modal
+                            key="LINK"
+                            className="link end"
+                            text="END GAME"
+                            to="/"
+                        />,
+                        <Freeplay {...props} {...viewProps} key="FREEPLAY" />
+                    ]} />
+                    {/* HELP */}
+                    {/* <Route path="/help" render={(props) => [
+                        <Modal
+                            key="LINK"
+                            className="link end"
+                            text="BACK"
+                            to="/"
+                        />,
+                        <Help {...props} {...viewProps} />
+                    ]} /> */}
+                </Switch>
+            </div>
+        )
+    }
+}

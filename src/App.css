@@ -1,4 +1,8 @@
 
+.App {
+  z-index: 1;
+}
+
 input {
   background: #DEF;
   outline: none;
@@ -7,25 +11,154 @@ input {
   border-radius: 4px;
 }
 
-.App {
+.Play, .Join, .Start, .Wait {
   display: flex;
   justify-content: space-around;
   align-items: flex-start;
 }
 
-#blur {
+.Join, .Start, .Wait, .Results {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+  min-height: 80vh;
+  padding: 10vh;
+}
+
+.Results {
+  color: #DEF;
+
+}
+
+.link {
+  position: absolute;
+  top: 0;
+  left: 0;
+  max-width: calc(100vw - 5px);
+  max-height: calc(100vh - 5px);
+  margin: 0;
+  background: none;
+  border: none;
+  box-shadow: none;
+  outline: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: 0.6s;
+}
+
+.link a, .link p {
+  color: #DEF;
+  text-decoration: none;
+  white-space: nowrap;
+  z-index: 2;
+  margin: 0 24px;
+  transition: text-shadow 0.2s;
+}
+
+.link a:hover, .link p:hover {
+  text-shadow: 1px 5px 30px rgba(189, 222, 255, 1.75);
+  /* color: #FFF; */
+  /* text-decoration: underline; */
+}
+
+.start {
+  top: 40vh;
+  height: 10vh;
+  width: 100%;
+  padding: 0 50%;
+  font-size: 36px;
+  opacity: 1;
+}
+
+.link.username {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: unset;
+  height: 32px;  
+  opacity: 0.5;
+}
+
+.end {
+  width: 10%;
+  padding: 0;
+  height: 32px;
+  opacity: 0.5;
+}
+
+.Join .end {
+  opacity: 0;
+}
+
+.Start input, .Join input {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border: 3px solid #DEF;
+  background: rgba(255, 255, 255, 0.1);
+  color: #DEF;
+  padding: 8px;
+  font-size: 24px;
+  text-align: center;
+}
+
+.input-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.input-wrapper h4 {
+  color: #DEF;
+  font-size: 20px;
+  margin-bottom: 16px;
+}
+
+.link-shadow {
+  position: fixed;
+  background-image: radial-gradient(black, transparent, transparent);
+  transition: 0.6s;
+  z-index: 1;
+}
+
+.start .link-shadow {
+  top: -100vh;
+  bottom: -100vh;
+  left: -100vw;
+  right: -100vw;
+  opacity: 1;
+}
+
+.end .link-shadow {
+  top: 0;
+  left: 0;
+  right: 100vw;
+  bottom: 100vh;
+  opacity: 0;
+}
+
+#background {
   position: fixed;
   top: -8px;
   right: -8px;
   bottom: -8px;
   left: -8px;
-  /* filter: brightness(0.35) blur(4px); */
-  /* background: rgba(15, 50, 105, 0.75); */
-  /* background-image: url(https://images.unsplash.com/photo-1520858155255-80d7f2569f22?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=6b16a7dddf7228dd3ccc20d563667161&auto=format&fit=crop&w=600&q=60); */
-  /* background-size: cover; */
-  /* background-position: center; */
+  background: #101838;  
+  z-index: -2;
+}
+
+#background-cover {
+  position: fixed;
+  top: -8px;
+  right: -8px;
+  bottom: -8px;
+  left: -8px;
+  background-image: radial-gradient(transparent, rgba(0, 0, 0, 0.075), rgba(0, 0, 0, 0.5));
   z-index: -1;
-  background: #101838;
 }
 
 .left {
@@ -50,7 +183,7 @@ input {
   padding: 32px;
   display: flex;
   flex-direction: column;
-  overflow-y: scroll;
+  /* overflow-y: scroll; */
 }
 
 .header {
@@ -280,6 +413,35 @@ button.invalid {
   align-items: center;
   top: 2px;
   left: 2px;
+}
+
+
+
+.games {
+  display: flex;
+  flex-direction: column;
+}
+
+.game, .start-game {
+  background: #DEF;
+  padding: 16px 24px;
+  border-radius: 8px;
+  margin: 8px;
+}
+
+.game:hover, .start-game:hover {
+  cursor: pointer;
+}
+
+
+.start-game {
+  margin-bottom: 48px;
+}
+
+.Join h4 {
+  margin-bottom: 20vh;
+  font-size: 20px;
+  color: #DEF;
 }
 
 

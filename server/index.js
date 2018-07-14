@@ -1,8 +1,17 @@
+// DEPENDENCIES
 const express = require('express');
 const bodyParser = require('body-parser');
+const socketio = require('socket.io');
 const axios = require('axios');
+const mongodb = require('mongodb');
 const MongoClient = require('mongodb').MongoClient;
-const Cache = require('./cache');
+// CACHE
+const Cache = require('./classes/cache');
+// CONTROLLERS
+const wctrl = require('./controllers/word-controller');
+const gctrl = require('./controllers/game-controller');
+const rctrl = require('./controllers/room-controller');
+// ENV
 require('dotenv').config();
 
 const {
@@ -23,92 +32,91 @@ app.use(express.static(`${__dirname}/../build`));
 
 const PORT = 3013;
 
-// MONGODB CONNECTION
+// MONGODB
 
-// COLLECTION
-const collection = 'boggle';
-
-// CONNECTION
 MongoClient.connect(MONGO_URI, function (err, client) {
-    if (err) {
-        console.log(`ERROR CONNECTING TO MONGODB`);
-        console.log(err);
-    }
+    if (err) console.log(`ERROR CONNECTING TO MONGODB`, err);
+    else console.log(`${MONGO_DBNAME} connected to server`);
+    // DB
     const db = client.db(MONGO_DBNAME);
-    app.set('db', db);
-    // OXFORD
-    const config = {
-        headers: {
-            APP_ID: OXFORD_APP_ID,
-            APP_KEY: OXFORD_APP_KEY
-        }
-    }
-    // ENV
-    const env = {
-        OXFORD_APP_ID,
-        OXFORD_APP_KEY,
-        OXFORD_URL
-    }
+    // COLLECTIONS
+    // db.collection('boggle-games').drop();
+    const ow = db.collection('oxford-words');
+    const bg = db.collection('boggle-games');
     // CACHE
-    const cache = new Cache({ config, db, collection, env });
+    const cache = new Cache({
+        config: { headers: { APP_ID: OXFORD_APP_ID, APP_KEY: OXFORD_APP_KEY } },
+        env: { OXFORD_APP_ID, OXFORD_APP_KEY, OXFORD_URL },
+        dbCollection: ow
+    });
+    // ADD INSTANCES TO APP
+    app.set('db', db);
+    app.set('ow', ow);
+    app.set('bg', bg);
     app.set('cache', cache);
-    console.log(`${MONGO_DBNAME} connected to server`);
-    app.listen(PORT, () => console.log(`Boggle listening on port ${PORT}`));
-});
 
-// ENDPOINTS
+    // LISTENING
+    const server = app.listen(PORT, () => console.log(`Boggle listening on port ${PORT}`));
 
-// GET ALL WORDS
-app.get('/api/words', (req, res) => {
-    const db = app.get('db');
-    db.collection(collection).find().toArray().then(words => {
-        res.status(200).send(words);
-    }).catch(err => {
-        res.status(500).send(err);
-    });
-});
-// GET SPECIFIC WORD
-app.get('/api/words/:word', (req, res) => {
-    const cache = app.get('cache');
-    let word = req.params.word;
-    cache.validate(word).then(results => {
-        res.status(200).send(results);
-    }).catch(err => {
-        res.status(500).send(err);
-    });
-});
-// GET DUPLICATES
-app.get('/api/duplicates', (req, res) => {
-    const db = app.get('db');
-    db.collection(collection).find().toArray().then(words => {
-        let results = words.filter(word => {
-            if (words.filter(item => item === word).length <= 1) return false;
-            else return true;
-        })
-        return res.status(200).send(results);
-    });
-});
-// GET CACHE
-app.get('/api/cache', (req, res) => {
-    res.status(200).send(cache.words);
-});
-// VALIDATE WORDS
-app.post('/api/validate', (req, res) => {
-    const cache = app.get('cache');
-    let { words } = req.body;
-    cache.validate(words).then(results => {
-        // console.log(results);
-        // console.log(JSON.stringify(cache, null, 4));
-        res.status(200).send(results);
-    }).catch(err => {
-        // console.log(err);        
-        // console.log(JSON.stringify(cache, null, 4));
-        res.status(500).send(err);
-    });
-});
+    // SOCKETS
+    const io = socketio(server);
 
-const path = require('path');
+    io.on('connection', socket => {
+        // console.log('SOCKET');
+        // console.log(Object.keys(socket));
+        // console.log('ROOMS');
+        // console.log(socket._rooms);
+        // console.log('CONNECTED');
+        // console.log(socket.connected);
+        // console.log('DISCONNECTED');
+        // console.log(socket.disconnected);
+        // console.log('HANDSHAKE');
+        // console.log(socket.handshake);
+        // JOIN ROOM
+        socket.on('join room', rctrl.joinRoom.bind({ socket }));
+        // LEAVE ROOM
+        socket.on('leave room', rctrl.leaveRoom.bind({ socket }));
+        // CREATE GAME
+        socket.on('create game', gctrl.createGame.bind({ app, socket, io }));
+        // FIND GAMES
+        socket.on('find games', gctrl.findGames.bind({ app, socket, io }));
+        // JOIN GAME
+        socket.on('join game', gctrl.joinGame.bind({ app, socket, io }));
+        // START GAME
+        socket.on('start game', gctrl.startGame.bind({ app, socket, io }));
+        // SAVE WORDS
+        socket.on('save words', gctrl.saveWords.bind({ app, socket, io }));
+        // END GAME
+        socket.on('end game', gctrl.endGame.bind({ app, socket, io }));
+    });
 
-app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../build/index.html'));
+    // ENDPOINTS
+
+    // GAME ENDPOINTS
+    app.get('/api/games', (req, res) => {
+        const bg = app.get('bg');
+        bg.find().toArray().then(games => {
+            res.status(200).send(games);
+        }).catch(err => {
+            console.log(err);
+        });
+    });
+
+    // GET ALL WORDS
+    app.get('/api/words', wctrl.getAllWords);
+    // GET DUPLICATES
+    app.get('/api/duplicates', wctrl.getDuplicates);
+    // GET CACHE
+    app.get('/api/cache', wctrl.getCache);
+    // GET SPECIFIC WORD
+    app.get('/api/words/:word', wctrl.validateOne);
+    // VALIDATE WORDS
+    app.post('/api/validate', wctrl.validateMany);
+
+    const path = require('path');
+
+    app.get('*', (req, res) => {
+        res.sendFile(path.join(__dirname, '../build/index.html'));
+    });
+
 });
