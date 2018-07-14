@@ -18,16 +18,15 @@ export default class Play extends Component {
         // REGISTER HISTORY IN APP
         registerHistory({ history, params });
         // CREATE BOARD
-        // const board = [
-        //     ["",  "",  "",  "",  ""],
-        //     ["",  "",  "",  "",  ""],
-        //     ["",  "G", "L", "",  ""],
-        //     ["O", "G", "",  "E", ""],
-        //     ["B", "",  "",  "",  ""]
-        // ];
+        const board = [
+            ["",  "",  "",  "",  ""],
+            ["",  "",  "",  "",  ""],
+            ["",  "G", "L", "",  ""],
+            ["O", "G", "",  "E", ""],
+            ["B", "",  "",  "",  ""]
+        ];
         // CREATE BOGGLE FROM BOARD
-        const boggle = new Boggle(5);
-        console.log(boggle)
+        const boggle = new Boggle(window.location.pathname.includes('/play') ? board : 5);
         // INITIALIZE PATH
         const path = Boggle.Path.default;
         // INITIAL STATE
