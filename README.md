@@ -3,6 +3,10 @@
 
 <br>
 
+I built this Boggle application just for fun. I was intrigued by the challenge of finding a way to take a boggle board and a word and checking in JavaScript if the word exists on the board. I also learned some MongoDB for the project, and came up with a cache system for minimizing the amount of HTTP requests made.
+
+<br>
+
 Live at >>> [https://boggle.thomaslowry.me/](https://boggle.thomaslowry.me/)
 
 <br>
@@ -19,7 +23,7 @@ Live at >>> [https://boggle.thomaslowry.me/](https://boggle.thomaslowry.me/)
 
 ## Word-Finding Algorithm
 
-This project features an algorithm that can take a Boggle board and a word and return a list of all paths on the board that can create the word. The challenge of creating this algorithm is actually the only reason I built this project. It sounded like a cool challenge, so I did it one night, and then I built a react fromt-end for it, and then I decided to integrate the Oxford Dictionary API for the sake of checking the validity of inputted words.
+This project features an algorithm that can take a Boggle board and a word and return a list of all paths on the board that can create the word. It sounded like a cool challenge, so I did it one night, and then I built a react front-end for it, and then I decided to integrate the Oxford Dictionary API for the sake of checking the validity of inputted words.
 
 ### Finding the First Letter
 
