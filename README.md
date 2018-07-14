@@ -3,7 +3,7 @@
 
 <br>
 
-I built this Boggle application just for fun. I was intrigued by the challenge of finding a way to take a boggle board and a word and checking in JavaScript if the word exists on the board. I also learned some MongoDB for the project, and came up with a cache system for minimizing the amount of HTTP requests made.
+I built this Boggle application just for fun. I was intrigued by the challenge of finding a way to take a boggle board and a word and check in JavaScript if the word exists on the board. I also learned some MongoDB for the project, and came up with a cache system for minimizing the amount of HTTP requests made.
 
 <br>
 
