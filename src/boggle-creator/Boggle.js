@@ -106,6 +106,7 @@ export default class Boggle {
     }
     validate(word) {
         if (!word) return [];
+        // convert word to array & join q & u -> could be changed to regexp
         word = word.toUpperCase().split('').reduce((arr, val) => {
             if (arr[arr.length - 1] === "Q" && val === "U") arr[arr.length - 1] += val;
             else arr.push(val);

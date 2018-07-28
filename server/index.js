@@ -23,12 +23,17 @@ const {
     BING_API_KEY_ONE,
     BING_API_KEY_TWO,
     BING_URL
-} = process.env
+} = process.env;
 
 const app = express();
 
 app.use(bodyParser.json());
 app.use(express.static(`${__dirname}/../build`));
+
+app.use((req, res, next) => {
+    console.log(req.body);
+    next();
+});
 
 const PORT = 3013;
 

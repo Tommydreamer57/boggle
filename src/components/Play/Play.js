@@ -19,12 +19,19 @@ export default class Play extends Component {
         registerHistory({ history, params });
         // CREATE BOARD
         const board = [
-            ["",  "",  "",  "",  ""],
-            ["",  "",  "",  "",  ""],
-            ["",  "G", "L", "",  ""],
-            ["O", "G", "",  "E", ""],
-            ["B", "",  "",  "",  ""]
+            ["", "", "", "", ""],
+            ["", "", "", "", ""],
+            ["", "G", "L", "", ""],
+            ["O", "G", "", "E", ""],
+            ["B", "", "", "", ""]
         ];
+        // const board = [
+        //     ["A", "A", "A", "A", "A"],
+        //     ["A", "A", "A", "A", "A"],
+        //     ["A", "A", "A", "A", "A"],
+        //     ["A", "A", "A", "A", "A"],
+        //     ["A", "A", "A", "A", "A"]
+        // ];
         // CREATE BOGGLE FROM BOARD
         const boggle = new Boggle(window.location.pathname.includes('/play') ? board : 5);
         // INITIALIZE PATH
@@ -182,7 +189,8 @@ export default class Play extends Component {
             let valid = word.validations.length;
             let tested = cache.some(validation => validation.value.toUpperCase() === word.value.toUpperCase());
             return valid && !tested;
-        }).map(word => word.value);
+            })
+            .map(word => word.value);
 
         // FOR ANIMATION'S SAKE
         this.setState({ validating: true });
@@ -194,7 +202,7 @@ export default class Play extends Component {
         if (filteredWords.length) request = axios.post('/api/validate', { words: filteredWords });
 
         // OTHERWISE CREATE NEW PROMISE THAT CAN STILL INVOKE .THEN CALLBACKS    
-        else request = new Promise(resolve => setTimeout(resolve.bind(null, { data: [] }), 0));
+        else request = new Promise(resolve => setTimeout(() => resolve({ data: [] }), 0));
 
         request.then(response => {
             console.log(response.data);
@@ -205,7 +213,7 @@ export default class Play extends Component {
             // ALLOW ANIMATION TO RUN 1/2 SECOND LONGER
             setTimeout(() => this.setState({ cache, oxfordValidations, validating: false }), 500);
         }).catch(err => {
-            console.log(err);
+            console.log({ err });
             setTimeout(() => this.setState({ validating: false }), 500);
         });
         this.requests.push(request);

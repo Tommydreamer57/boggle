@@ -1,0 +1,3 @@
+word.length
+board.length * row.length
+worst possible outcome is with a board of all the same letter, searching for a word with just that letter - 16 times - this would find all possible permutations in the board

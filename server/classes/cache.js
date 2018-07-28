@@ -1,6 +1,11 @@
 const axios = require('axios');
 const dump = require('../dump/words.json');
 
+const dictionary = dump.reduce((obj, word) => {
+    obj[word.value.toUpperCase()] = word.defined;
+    return obj;
+}, {})
+
 class Cache {
     constructor({ dbCollection, config, env }) {
         // DATABASE
@@ -9,8 +14,8 @@ class Cache {
         this.config = config;
         // ENV
         this.env = env;
-        // WORDS
-        this.words = dump;
+        // DICTIONARY
+        this.dictionary = dictionary;
         // REQUEST ID
         this.currentRequestId = -1;
         // CURRENT REQUESTS
@@ -59,17 +64,23 @@ class Cache {
         if (!word) return;
         const { value, defined } = word;
         // CHECK IF ALREADY CACHED
-        if (this.words.find(cachedWord => cachedWord.value.toUpperCase() === value.toUpperCase() && cachedWord.defined === defined)) return;
-        // ONLY ADD VALUE AND DEFINED PROPERTIES
-        this.words.push({ value, defined });
-        return word;
+        if (!this.dictionary.hasOwnProperty(value.toUpperCase())) {
+            this.dictionary[value.toUpperCase()] = defined;
+            return word;
+        }
     }
     find(...words) {
         if (words.length === 1 && Array.isArray(words[0])) words = words[0];
         return words.map(this.findOne);
     }
     findOne(wordString) {
-        return this.words.find(word => word.value.toUpperCase() === wordString.toUpperCase());
+        let result = this.dictionary[wordString.toUpperCase()];
+        if (result !== undefined) {
+            return {
+                value: wordString.toUpperCase(),
+                defined: result
+            };
+        }
     }
     findInDb(wordString) {
         const query = { value: wordString };

@@ -2,8 +2,10 @@ module.exports = {
     getAllWords(req, res) {
         const ow = req.app.get('ow');
         ow.find().toArray().then(words => {
+            console.log(words);
             res.status(200).send(words);
         }).catch(err => {
+            console.log(err);
             res.status(500).send(err);
         });
     },
@@ -18,8 +20,14 @@ module.exports = {
         });
     },
     getCache(req, res) {
-        const cache = req.app.get('cache');
-        res.status(200).send(cache.words);
+        const { dictionary } = req.app.get('cache');
+        console.log(dictionary);
+        const words = Object.keys(dictionary).map(value => ({
+            value,
+            defined: dictionary[value]
+        }));
+        console.log(words);
+        res.status(200).send(words);
     },
     validateOne(req, res) {
         const cache = req.app.get('cache');
@@ -27,16 +35,19 @@ module.exports = {
         cache.validate(word).then(results => {
             res.status(200).send(results);
         }).catch(err => {
+            console.log("VALIDATE ON ERROR");
+            console.log(err);
             res.status(500).send(err);
         });
     },
     validateMany(req, res) {
         const cache = req.app.get('cache');
         let { words } = req.body;
-        console.log(words);
         cache.validate(words).then(results => {
             res.status(200).send(results);
         }).catch(err => {
+            console.log("VALIDATE MANY ERROR");
+            console.log(err);
             res.status(500).send(err);
         });
     }
